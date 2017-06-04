@@ -21,7 +21,7 @@ public class HttpGateEntryPoint {
         String schemaString = "{\"type\": \"record\", " +
                 "\"name\": \"kevent\"," +
                 "\"fields\": [" +
-                "{\"name\": \"timestamp\", \"type\": \"long\"}," +
+//                "{\"name\": \"timestamp\", \"type\": \"long\"}," +
                 "{\"name\": \"payload\", \"type\": \"bytes\"}" +
                 "]}";
         Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
