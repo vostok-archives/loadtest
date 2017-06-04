@@ -10,7 +10,7 @@ import org.rapidoid.http.MediaType;
 import org.rapidoid.net.abstracts.Channel;
 import org.rapidoid.net.impl.RapidoidHelper;
 
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,6 +20,7 @@ public class KHttpServer extends AbstractHttpServer {
     private static final byte[] URI_HELLO = "/hello".getBytes();
     private static final byte[] URI_NOOP = "/noop".getBytes();
     private static final byte[] URI_GEN = "/gen".getBytes();
+    private static final byte[] URI_KLOAD_10 = "/kload10".getBytes();
     private static final byte[] URI_KLOAD_100 = "/kload100".getBytes();
     private static final byte[] URI_KLOAD_1000 = "/kload1000".getBytes();
     private static final byte[] HELLO_WORLD = "Hello, World!".getBytes();
@@ -39,7 +40,9 @@ public class KHttpServer extends AbstractHttpServer {
     protected HttpStatus handle(Channel ctx, Buf buf, RapidoidHelper req) {
         if (req.isGet.value) {
             boolean isKeepAlive = req.isKeepAlive.value;
-            if (matches(buf, req.path, URI_KLOAD_100)) {
+            if (matches(buf, req.path, URI_KLOAD_10)) {
+                return GenerateKafkaLoad(ctx, 10, isKeepAlive, true);
+            } else if (matches(buf, req.path, URI_KLOAD_100)) {
                 return GenerateKafkaLoad(ctx, 100, isKeepAlive, true);
             } else if (matches(buf, req.path, URI_KLOAD_1000)) {
                 return GenerateKafkaLoad(ctx, 1000, isKeepAlive, true);
@@ -71,8 +74,8 @@ public class KHttpServer extends AbstractHttpServer {
         }
     }
 
-    public byte[] generatePayload(int eventSize) {
-        int from = ThreadLocalRandom.current().nextInt(0, randomBytesSource.length - eventSize);
-        return Arrays.copyOfRange(randomBytesSource, from, from + eventSize);
+    public ByteBuffer generatePayload(int eventSize) {
+        int offset = ThreadLocalRandom.current().nextInt(0, randomBytesSource.length - eventSize);
+        return ByteBuffer.wrap(randomBytesSource, offset, eventSize).slice();
     }
 }
