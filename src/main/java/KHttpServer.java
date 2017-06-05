@@ -28,7 +28,7 @@ public class KHttpServer extends AbstractHttpServer {
     private final Producer<String, GenericRecord> producer;
     private byte[] randomBytesSource;
 
-    public KHttpServer(Schema schema, Producer<String, GenericRecord> producer) {
+    KHttpServer(Schema schema, Producer<String, GenericRecord> producer) {
         this.schema = schema;
         this.producer = producer;
         Random random = new Random(UUID.randomUUID().hashCode());
@@ -64,7 +64,7 @@ public class KHttpServer extends AbstractHttpServer {
 
     private void produceEvents(int eventSize, boolean publishToKafka) {
         //long timestamp = System.currentTimeMillis();
-        for (long nEvents = 0; nEvents < 100; nEvents++) {
+        for (long nEvents = 0; nEvents < 1000; nEvents++) {
             GenericRecord kevent = new GenericData.Record(schema);
             //kevent.put("timestamp", timestamp);
             kevent.put("payload", generatePayload(eventSize));
@@ -74,7 +74,7 @@ public class KHttpServer extends AbstractHttpServer {
         }
     }
 
-    public ByteBuffer generatePayload(int eventSize) {
+    private ByteBuffer generatePayload(int eventSize) {
         int offset = ThreadLocalRandom.current().nextInt(0, randomBytesSource.length - eventSize);
         return ByteBuffer.wrap(randomBytesSource, offset, eventSize).slice();
     }
