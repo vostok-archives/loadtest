@@ -15,9 +15,10 @@ public class HttpGateEntryPoint {
         props.put("bootstrap.servers", "edi15:9092");
         props.put("acks", "0");
         props.put("retries", 0);
-        props.put("linger.ms", 20);
+        props.put("linger.ms", 10);
         props.put("batch.size", 64 * 1000);
-        props.put("buffer.memory", 1000 * 1000 * 1000);
+        props.put("buffer.memory", 128 * 1000 * 1000);
+        props.put("compression.type", "lz4");
         props.put("key.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("schema.registry.url", "http://edi15:8881");
