@@ -17,7 +17,7 @@ public class HttpGateEntryPoint {
         props.put("retries", 0);
         props.put("linger.ms", 20);
         props.put("batch.size", 64 * 1000);
-        props.put("buffer.memory", 512 * 1000 * 1000);
+        props.put("buffer.memory", 1000 * 1000 * 1000);
         props.put("key.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("schema.registry.url", "http://edi15:8881");
