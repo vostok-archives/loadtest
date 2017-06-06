@@ -19,7 +19,7 @@ public class HttpGateEntryPoint {
         props.put("batch.size", 64 * 1000);
         props.put("buffer.memory", 256 * 1000 * 1000);
         props.put("max.request.size", 20 * 1000 * 1000);
-        props.put("compression.type", "lz4");
+        props.put("compression.type", "none");
         props.put("metadata.fetch.timeout.ms", 25);
         props.put("max.block.ms", 25);
         props.put("max.in.flight.requests.per.connection", 500);
