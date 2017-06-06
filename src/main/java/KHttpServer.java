@@ -68,7 +68,7 @@ public class KHttpServer extends AbstractHttpServer {
             GenericRecord kevent = new GenericData.Record(schema);
             kevent.put("timestamp", timestamp);
             kevent.put("payload", generatePayload(eventSize));
-            ProducerRecord<String, GenericRecord> data = new ProducerRecord<>("ktopic", kevent);
+            ProducerRecord<String, GenericRecord> data = new ProducerRecord<>("ktopic-with-ts", kevent);
             if (publishToKafka)
                 producer.send(data);
         }
