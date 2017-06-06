@@ -13,7 +13,7 @@ public class HttpGateEntryPoint {
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
         props.put("bootstrap.servers", "edi15:9092");
-        props.put("acks", "0");
+        props.put("acks", "1");
         props.put("retries", 0);
         props.put("linger.ms", 20);
         props.put("batch.size", 64 * 1000);
