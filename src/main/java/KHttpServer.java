@@ -63,10 +63,10 @@ public class KHttpServer extends AbstractHttpServer {
     }
 
     private void produceEvents(int eventSize, boolean publishToKafka) {
-        //long timestamp = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
         for (long nEvents = 0; nEvents < 100; nEvents++) {
             GenericRecord kevent = new GenericData.Record(schema);
-            //kevent.put("timestamp", timestamp);
+            kevent.put("timestamp", timestamp);
             kevent.put("payload", generatePayload(eventSize));
             ProducerRecord<String, GenericRecord> data = new ProducerRecord<>("ktopic", kevent);
             if (publishToKafka)
