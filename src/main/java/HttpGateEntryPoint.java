@@ -12,7 +12,7 @@ public class HttpGateEntryPoint {
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "edi15:9092");
+        props.put("bootstrap.servers", "icat-test01:9092");
         props.put("acks", "1");
         props.put("retries", 0);
         props.put("linger.ms", 20);
@@ -25,7 +25,7 @@ public class HttpGateEntryPoint {
         props.put("max.in.flight.requests.per.connection", 500);
         props.put("key.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
-        props.put("schema.registry.url", "http://edi15:8881");
+        props.put("schema.registry.url", "http://icat-test01:8881");
         String schemaString = "{\"type\": \"record\", " +
                 "\"name\": \"kevent\"," +
                 "\"fields\": [" +
