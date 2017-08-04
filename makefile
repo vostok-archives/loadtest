@@ -31,6 +31,13 @@ fire: pull
 	echo "<Monitoring>"                                                                           >  monitoring.xml
 	for host in edi18 icat-test01 icat-test02 icat-test03 ; do \
 		echo "  <Host address=\"$$host\">"                                                        >> monitoring.xml ; \
+		echo "    <CPU />"                                                                        >> monitoring.xml ; \
+		echo "    <Kernel />"                                                                     >> monitoring.xml ; \
+		echo "    <System />"                                                                     >> monitoring.xml ; \
+		echo "    <Memory />"                                                                     >> monitoring.xml ; \
+		echo "    <Disk />"                                                                       >> monitoring.xml ; \
+		echo "    <Net />"                                                                        >> monitoring.xml ; \
+		echo "    <Netstat />"                                                                    >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	echo "</Monitoring>"                                                                          >> monitoring.xml
