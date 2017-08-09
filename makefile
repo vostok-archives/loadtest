@@ -32,6 +32,7 @@ fire: pull
 		echo "    <Memory />"                                                                     >> monitoring.xml ; \
 		echo "    <Disk devices='[\"sda3\",\"sda4\"]'></Disk>"                                    >> monitoring.xml ; \
 		echo "    <Net interfaces='[\"team0\"]'></Net>"                                           >> monitoring.xml ; \
+		echo "    <Netstat />"                                                                    >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	echo "</Monitoring>"                                                                          >> monitoring.xml
