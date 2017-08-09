@@ -31,6 +31,7 @@ fire: pull
 		echo "    <CPU />"                                                                        >> monitoring.xml ; \
 		echo "    <Memory />"                                                                     >> monitoring.xml ; \
 		echo "    <Disk devices='[\"sda3\",\"sda4\"]'></Disk>"                                    >> monitoring.xml ; \
+		echo "    <Net />"                                                                        >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	echo "</Monitoring>"                                                                          >> monitoring.xml
