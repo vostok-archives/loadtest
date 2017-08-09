@@ -30,7 +30,7 @@ fire: pull
 		echo "  <Host address=\"$$host\" comment=\"$$host\">"                                     >> monitoring.xml ; \
 		echo "    <CPU />"                                                                        >> monitoring.xml ; \
 		echo "    <Memory />"                                                                     >> monitoring.xml ; \
-		echo "    <Disk devices='["sda3","sda4"]'></Disk>"                                        >> monitoring.xml ; \
+		echo "    <Disk devices='[\"sda3\",\"sda4\"]'></Disk>"                                    >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	echo "</Monitoring>"                                                                          >> monitoring.xml
