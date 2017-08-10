@@ -11,8 +11,6 @@ namespace KafkaService
     {
         static void Main(string[] args)
         {
-            Assembly.LoadFrom("librdkafka.dll");
-            
             if (args.Length < 2)
             {
                 throw new Exception("Bad starting format. Template: \"KafkaService.exe {selfPort} {kafkaUri}\".");
