@@ -9,9 +9,9 @@ REV=$(shell git rev-parse --short HEAD)
 
 run:
 ifeq ($LANG, "Java")
-    @make runjava
+	@make runjava
 else
-    @make rundotnet
+	@make rundotnet
 endif
 
 runjava: buildjava
