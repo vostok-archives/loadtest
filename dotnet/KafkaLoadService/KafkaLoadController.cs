@@ -13,7 +13,15 @@ namespace KafkaService
 
         public KafkaLoadController()
         {
-            kafkaProducer = GetProducer();
+            try
+            {
+                kafkaProducer = GetProducer();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         [HttpGet]
