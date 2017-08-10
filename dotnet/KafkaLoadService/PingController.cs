@@ -20,5 +20,11 @@ namespace KafkaService
         public void PingNoop()
         {
         }
+
+        [HttpGet]
+        public void Error()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

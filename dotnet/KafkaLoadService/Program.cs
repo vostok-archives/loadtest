@@ -47,7 +47,7 @@ namespace KafkaService
             routes.AddRoute<KafkaLoadController>("kload100", c => c.Load100());
             routes.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000());
             routes.AddRoute<KafkaLoadController>("gen", c => c.Generate());
-            routes.AddRoute<KafkaLoadController>("error", c => c.Error());
+            routes.AddRoute<PingController>("error", c => c.Error());
         }
     }
 
