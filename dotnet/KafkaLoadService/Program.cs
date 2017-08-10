@@ -17,7 +17,7 @@ namespace KafkaService
             var selfPort = args[0];
             var kafkaTopology = args[1];
             TopologyService.Add("Kafka", kafkaTopology);
-            var baseAddress = $"http://localhost:{selfPort}/";
+            var baseAddress = $"http://+:{selfPort}/";
             
             using (WebApp.Start(baseAddress, Configurate))
             {
