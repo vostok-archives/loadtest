@@ -8,7 +8,7 @@ LANG=Java
 REV=$(shell git rev-parse --short HEAD)
 
 run:
-ifeq ($LANG, "Java")
+ifeq (${LANG}, Java)
 	@make runjava
 else
 	@make rundotnet
