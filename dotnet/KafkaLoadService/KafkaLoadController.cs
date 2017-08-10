@@ -71,5 +71,11 @@ namespace KafkaService
 
             return new KafkaProducer(producerSetting);
         }
+
+        [HttpGet]
+        public void Error()
+        {
+            throw new Exception();
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Http;
+using System.Web.Http.Filters;
 using Microsoft.Owin.Hosting;
 using Owin;
 
@@ -18,7 +19,7 @@ namespace KafkaService
             var kafkaTopology = args[1];
             TopologyService.Add("Kafka", kafkaTopology);
             var baseAddress = $"http://+:{selfPort}/";
-            
+
             using (WebApp.Start(baseAddress, Configurate))
             {
                 Console.WriteLine("Server started");
@@ -30,7 +31,9 @@ namespace KafkaService
         {
             var configuration = new HttpConfiguration();
             ConfigurateRoutes(configuration.Routes);
+            configuration.Filters.Add(new ImpExceptionFilterAttribute());
             builder.UseWebApi(configuration);
+
         }
 
         private static void ConfigurateRoutes(HttpRouteCollection routes)
@@ -44,6 +47,17 @@ namespace KafkaService
             routes.AddRoute<KafkaLoadController>("kload100", c => c.Load100());
             routes.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000());
             routes.AddRoute<KafkaLoadController>("gen", c => c.Generate());
+            routes.AddRoute<KafkaLoadController>("error", c => c.Error());
         }
     }
+
+    public class ImpExceptionFilterAttribute : ExceptionFilterAttribute
+    {
+        public override void OnException(HttpActionExecutedContext actionExecutedContext)
+        {
+            Console.WriteLine(actionExecutedContext.Exception);
+            base.OnException(actionExecutedContext);
+        }
+    }
+
 }
