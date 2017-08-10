@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Filters;
 using Microsoft.Owin.Hosting;
@@ -10,6 +11,8 @@ namespace KafkaService
     {
         static void Main(string[] args)
         {
+            Assembly.LoadFrom("librdkafka.dll");
+            
             if (args.Length < 2)
             {
                 throw new Exception("Bad starting format. Template: \"KafkaService.exe {selfPort} {kafkaUri}\".");
