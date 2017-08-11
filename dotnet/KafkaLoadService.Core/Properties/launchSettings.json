@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KafkaLoadService.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "9000 http://localhost:9092"
+    }
+  }
+}
