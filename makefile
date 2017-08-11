@@ -21,7 +21,7 @@ buildjava: pull
 	mvn clean package
 
 rundotnet: pull
-    dotnet run --project dotnet/KafkaLoadService.Core/KafkaLoadService.Core.csproj -- ${GATEPORT} icat-test01:9202
+	dotnet run --project dotnet/KafkaLoadService.Core/KafkaLoadService.Core.csproj -- ${GATEPORT} icat-test01:9202
 
 builddotnet: pull
 	cd dotnet/KafkaLoadService.Core && dotnet build
