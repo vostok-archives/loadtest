@@ -4,6 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ThreadPoolMinThreads>100</ThreadPoolMinThreads>
+    <ThreadPoolMaxThreads>1000</ThreadPoolMaxThreads>
   </PropertyGroup>
 
   <ItemGroup>
