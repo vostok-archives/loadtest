@@ -1,0 +1,8 @@
+﻿{
+    "settings": {
+        "ServicePort": "8888"
+    },
+    "topology": {
+        "Kafka": ["icat-test01:9202"]
+    }
+}

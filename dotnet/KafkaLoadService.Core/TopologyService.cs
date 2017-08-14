@@ -8,24 +8,14 @@ namespace KafkaLoadService.Core
     {
         private static Dictionary<string, HashSet<Uri>> map = new Dictionary<string, HashSet<Uri>>();
 
-        public static void Add(string topologyName, string url)
+        public static void Fill(Dictionary<string, string[]> topology)
         {
-            Add(topologyName, new Uri(url));
-        }
-
-        public static void Add(string topologyName, Uri url)
-        {
-            if (!map.ContainsKey(topologyName))
-            {
-                map[topologyName] = new HashSet<Uri>();
-            }
-
-            map[topologyName].Add(url);
+            map = topology.ToDictionary(x => x.Key, x => new HashSet<Uri>(x.Value.Select(uriString => new Uri(uriString))));
         }
 
         public static Uri[] GetTopology(string topologyName)
         {
-            return Enumerable.ToArray<Uri>(map[topologyName]);
+            return Enumerable.ToArray(map[topologyName]);
         }
     }
 }

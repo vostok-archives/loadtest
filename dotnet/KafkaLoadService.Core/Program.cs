@@ -1,23 +1,18 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.DotNet.PlatformAbstractions;
 
 namespace KafkaLoadService.Core
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            if (args.Length < 2)
-            {
-                throw new Exception("Bad starting format. Template: \"KafkaService.exe {selfPort} {kafkaUri}\".");
-            }
-
-            
-            var selfPort = args[0];
-            var kafkaTopology = args[1];
-            TopologyService.Add("Kafka", kafkaTopology);
-            var baseAddress = $"http://*:{selfPort}/";
+            var configPath = ApplicationEnvironment.ApplicationBasePath + "\\config.json";
+            SettingsProvider.FillFromFile(configPath);
+            var settings = SettingsProvider.GetSettings();
+            var baseAddress = $"http://*:{settings.ServicePort}/";
 
             new WebHostBuilder()
                 .UseKestrel()
