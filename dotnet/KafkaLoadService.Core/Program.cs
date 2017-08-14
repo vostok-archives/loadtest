@@ -8,7 +8,7 @@ namespace KafkaLoadService.Core
     {
         static void Main()
         {
-            var configPath = ApplicationEnvironment.ApplicationBasePath + "\\config.json";
+            var configPath = Path.Combine(ApplicationEnvironment.ApplicationBasePath, "config.json");
             SettingsProvider.FillFromFile(configPath);
             var settings = SettingsProvider.GetSettings();
             var baseAddress = $"http://*:{settings.ServicePort}/";
