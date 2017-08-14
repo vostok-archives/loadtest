@@ -15,7 +15,7 @@ namespace KafkaLoadService.Core
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
+            //loggerFactory.AddConsole();
             app.UseMvc(ConfigurateRoutes);
         }
 
