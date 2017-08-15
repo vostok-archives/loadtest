@@ -3,6 +3,6 @@
         "ServicePort": "8888"
     },
     "topology": {
-        "Kafka": ["http://icat-test01:9202"]
+        "Kafka": ["http://icat-test01:9092"]
     }
 }

@@ -7,13 +7,6 @@ GATEPORT=8888
 LANG=Java
 REV=$(shell git rev-parse --short HEAD)
 
-run:
-ifeq (${LANG}, Java)
-	@make runjava
-else
-	@make rundotnet
-endif
-
 runjava: buildjava
 	java -Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar ./target/uber-kload-1.0-SNAPSHOT.jar
 
