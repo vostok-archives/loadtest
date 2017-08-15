@@ -74,9 +74,4 @@ namespace KafkaClient
             return settings;
         }
     }
-
-    public enum CompressionCodes
-    {
-        none
-    }
 }

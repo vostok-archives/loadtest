@@ -1,5 +1,4 @@
-﻿using System;
-using KafkaClient;
+﻿using KafkaClient;
 
 namespace KafkaLoadService.Core
 {
@@ -16,13 +15,8 @@ namespace KafkaLoadService.Core
                 .SetBootstrapServers(topology)
                 .SetAcks(1)
                 .SetRetries(0)
-                .SetLinger(TimeSpan.FromMilliseconds(20))
-                .SetBatchSize(64*1000)
-                .SetBufferingSize(256*1000)
-                .SetCompression(CompressionCodes.none)
-                .SetMetadataRequestTimeout(TimeSpan.FromMilliseconds(25))
-                .SetMaxBlocking(TimeSpan.FromMilliseconds(25))
-                .SetMaxInFlightRequestsPerConnection(500)
+                .Set("queue.buffering.max.ms", 20)
+                .Set("socket.blocking.max.ms", 25)
                 .SetClientId("client-id");
             kafkaProducer = new KafkaProducer(kafkaSetting);
         }

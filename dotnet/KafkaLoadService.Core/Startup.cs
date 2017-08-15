@@ -25,12 +25,12 @@ namespace KafkaLoadService.Core
             routeBuilder.AddRoute<PingController>("hello", c => c.PingHelloWorld());
             routeBuilder.AddRoute<PingController>("noop", c => c.PingNoop());
             routeBuilder.AddRoute<PingController>("error", c => c.Error());
-            routeBuilder.AddRoute<KafkaLoadController>("kload/timer", c => c.LoadWithTimer(0, 0));
-            routeBuilder.AddRoute<KafkaLoadController>("kload", c => c.Load(0, 0));
-            routeBuilder.AddRoute<KafkaLoadController>("kload10", c => c.Load10());
-            routeBuilder.AddRoute<KafkaLoadController>("kload100", c => c.Load100());
-            routeBuilder.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000());
-            routeBuilder.AddRoute<KafkaLoadController>("gen", c => c.Generate());
+            routeBuilder.AddRoute<KafkaLoadController>("kload/timer", c => c.LoadWithTimerAsync(0, 0));
+            routeBuilder.AddRoute<KafkaLoadController>("kload", c => c.LoadAsync(0, 0));
+            routeBuilder.AddRoute<KafkaLoadController>("kload10", c => c.Load10Async());
+            routeBuilder.AddRoute<KafkaLoadController>("kload100", c => c.Load100Async());
+            routeBuilder.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000Async());
+            routeBuilder.AddRoute<KafkaLoadController>("gen", c => c.GenerateAsync());
         }
     }
 }

@@ -18,40 +18,38 @@ namespace KafkaLoadService.Core
         }
 
         [HttpGet]
-        public void LoadWithTimer(int requestCount, int bodySize)
+        public async Task LoadWithTimerAsync(int requestCount, int bodySize)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            Load(requestCount, bodySize);
+            await LoadAsync(requestCount, bodySize).ConfigureAwait(false);
             stopwatch.Stop();
             Console.WriteLine(
                 $"{nameof(requestCount)}: {requestCount}, {nameof(bodySize)}: {bodySize}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds}");
         }
 
+        [HttpGet]
+        public Task Load10Async() => LoadAsync(100, 10);
+        [HttpGet]
+        public Task Load100Async() => LoadAsync(100, 100);
+        [HttpGet]
+        public Task Load1000Async() => LoadAsync(100, 1000);
+        [HttpGet]
+        public Task GenerateAsync() => LoadAsync(100, 1000, false);
 
         [HttpGet]
-        public void Load10() => Load(100, 10);
-        [HttpGet]
-        public void Load100() => Load(100, 100);
-        [HttpGet]
-        public void Load1000() => Load(100, 1000);
-        [HttpGet]
-        public void Generate() => Load(100, 1000, false);
+        public Task LoadAsync(int requestCount, int bodySize) => LoadAsync(requestCount, bodySize, true);
 
-        [HttpGet]
-        public void Load(int requestCount, int bodySize) => Load(requestCount, bodySize, true);
-
-        private void Load(int requestCount, int bodySize, bool publishToKafka)
+        private Task LoadAsync(int requestCount, int bodySize, bool publishToKafka)
         {
             var random = new Random();
-            for (var i = 0; i < requestCount; i++)
-            {
-                var body = GenerateBody(random, bodySize);
-                if (publishToKafka)
-                {
-                    kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
-                }
-            }
+            var tasks = Enumerable.Range(0, requestCount)
+                .Select(i => GenerateBody(random, bodySize))
+                .Where(body => publishToKafka)
+                .Select(body => kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body))
+                .ToArray();
+
+            return Task.WhenAll(tasks);
         }
 
         private static byte[] GenerateBody(Random random, int bodySize)
