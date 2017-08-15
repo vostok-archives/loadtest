@@ -15,7 +15,7 @@ namespace KafkaLoadService.Core
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            //loggerFactory.AddConsole();
+            loggerFactory.AddConsole((s, l) => l >= LogLevel.Error);
             app.UseMvc(ConfigurateRoutes);
         }
 
@@ -26,6 +26,7 @@ namespace KafkaLoadService.Core
             routeBuilder.AddRoute<PingController>("noop", c => c.PingNoop());
             routeBuilder.AddRoute<PingController>("error", c => c.Error());
             routeBuilder.AddRoute<KafkaLoadController>("kload/timer", c => c.LoadWithTimer(0, 0));
+            routeBuilder.AddRoute<KafkaLoadController>("kload/timer/async", c => c.LoadWithTimerAsync(0, 0));
             routeBuilder.AddRoute<KafkaLoadController>("kload", c => c.Load(0, 0));
             routeBuilder.AddRoute<KafkaLoadController>("kload10", c => c.Load10());
             routeBuilder.AddRoute<KafkaLoadController>("kload100", c => c.Load100());

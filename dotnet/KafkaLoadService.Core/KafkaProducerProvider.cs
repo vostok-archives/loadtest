@@ -1,4 +1,5 @@
-﻿using KafkaClient;
+﻿using System;
+using KafkaClient;
 
 namespace KafkaLoadService.Core
 {
@@ -11,11 +12,19 @@ namespace KafkaLoadService.Core
 
             var topology = TopologyService.GetTopology("Kafka");
 
-            var producerSetting = new KafkaSetting();
-            producerSetting.AddBootstrapServers(topology);
-            producerSetting.AddClientId("producer_1");
-
-            kafkaProducer = new KafkaProducer(producerSetting);
+            var kafkaSetting = new KafkaSetting()
+                .SetBootstrapServers(topology)
+                .SetAcks(1)
+                .SetRetries(0)
+                .SetLinger(TimeSpan.FromMilliseconds(20))
+                .SetBatchSize(64*1000)
+                .SetBufferingSize(256*1000)
+                .SetCompression(CompressionCodes.none)
+                .SetMetadataRequestTimeout(TimeSpan.FromMilliseconds(25))
+                .SetMaxBlocking(TimeSpan.FromMilliseconds(25))
+                .SetMaxInFlightRequestsPerConnection(500)
+                .SetClientId("client-id");
+            kafkaProducer = new KafkaProducer(kafkaSetting);
         }
 
         public static KafkaProducer Get()

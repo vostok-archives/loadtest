@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using KafkaClient;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,15 +14,7 @@ namespace KafkaLoadService.Core
 
         public KafkaLoadController()
         {
-            try
-            {
-                kafkaProducer = KafkaProducerProvider.Get();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            kafkaProducer = KafkaProducerProvider.Get();
         }
 
         [HttpGet]
