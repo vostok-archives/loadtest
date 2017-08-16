@@ -21,17 +21,24 @@ namespace KafkaClient
             ProduceAsync(topic, key, value).GetAwaiter().GetResult();
         }
 
-        public async Task ProduceAsync(string topic, Guid key, byte[] value)
+        public Task ProduceAsync(string topic, Guid key, byte[] value)
         {
             var task = producer.ProduceAsync(topic, key.ToByteArray(), value);
-            if (!disableDeliveryReports)
+            if (disableDeliveryReports)
             {
-                var message = await task.ConfigureAwait(false);
+                return Task.CompletedTask;
+            }
 
-                if (message.Error.HasError)
-                {
-                    throw new Exception(message.Error.Reason);
-                }
+            return CheckResultAsync(task);
+        }
+
+        private async Task CheckResultAsync(Task<Message> task)
+        {
+            var message = await task.ConfigureAwait(false);
+
+            if (message.Error.HasError)
+            {
+                throw new Exception(message.Error.Reason);
             }
         }
 
