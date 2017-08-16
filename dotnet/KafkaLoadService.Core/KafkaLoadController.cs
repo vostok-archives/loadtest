@@ -40,16 +40,19 @@ namespace KafkaLoadService.Core
         [HttpGet]
         public Task LoadAsync(int requestCount, int bodySize) => LoadAsync(requestCount, bodySize, true);
 
-        private Task LoadAsync(int requestCount, int bodySize, bool publishToKafka)
+        private async Task LoadAsync(int requestCount, int bodySize, bool publishToKafka)
         {
             var random = new Random();
-            var tasks = Enumerable.Range(0, requestCount)
+            var bodies = Enumerable.Range(0, requestCount)
                 .Select(i => GenerateBody(random, bodySize))
-                .Where(body => publishToKafka)
-                .Select(body => kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body))
                 .ToArray();
-
-            return Task.WhenAll(tasks);
+            if (publishToKafka)
+            {
+                foreach (var body in bodies)
+                {
+                    await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body).ConfigureAwait(false);
+                }
+            }
         }
 
         private static byte[] GenerateBody(Random random, int bodySize)
