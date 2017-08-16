@@ -21,7 +21,7 @@ namespace KafkaLoadService.Core
 
         private static void ConfigurateRoutes(IRouteBuilder routeBuilder)
         {
-            routeBuilder.AddRoute<PingController>("ping", c => c.Ping());
+            routeBuilder.AddRoute<KafkaLoadController>("ping", c => c.Ping());
             routeBuilder.AddRoute<PingController>("hello", c => c.PingHelloWorld());
             routeBuilder.AddRoute<PingController>("noop", c => c.PingNoop());
             routeBuilder.AddRoute<PingController>("error", c => c.Error());

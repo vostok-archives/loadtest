@@ -18,6 +18,12 @@ namespace KafkaLoadService.Core
         }
 
         [HttpGet]
+        public string Ping()
+        {
+            return "Ok";
+        }
+
+        [HttpGet]
         public async Task LoadWithTimerAsync(int requestCount, int bodySize)
         {
             var stopwatch = new Stopwatch();
