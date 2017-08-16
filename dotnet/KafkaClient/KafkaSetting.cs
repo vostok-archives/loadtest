@@ -7,9 +7,14 @@ namespace KafkaClient
     ///     librdkafka configuration parameters (refer to https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md).
     public class KafkaSetting
     {
-        public bool DisableDeliveryReports { get; set; }
+        public bool DisableDeliveryReports { get; }
 
         private readonly Dictionary<string, object> settings = new Dictionary<string, object>();
+
+        public KafkaSetting(bool disableDeliveryReports = false)
+        {
+            DisableDeliveryReports = disableDeliveryReports;
+        }
 
         public KafkaSetting SetBootstrapServers(params Uri[] servers)
         {

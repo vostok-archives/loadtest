@@ -8,10 +8,9 @@ namespace KafkaLoadService.Core
 
         static KafkaProducerProvider()
         {
-
             var topology = TopologyService.GetTopology("Kafka");
-
-            var kafkaSetting = new KafkaSetting()
+            var settings = SettingsProvider.GetSettings();
+            var kafkaSetting = new KafkaSetting(settings.DisableKafkaReports)
                 .SetBootstrapServers(topology)
                 .SetAcks(1)
                 .SetRetries(0)

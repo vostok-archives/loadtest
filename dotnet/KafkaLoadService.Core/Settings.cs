@@ -3,5 +3,6 @@
     public class Settings
     {
         public string ServicePort { get; set; }
+        public bool DisableKafkaReports { get; set; }
     }
 }
