@@ -16,6 +16,7 @@ namespace KafkaLoadService.Core
                 .SetRetries(0)
                 .Set("queue.buffering.max.ms", 20)
                 .Set("socket.blocking.max.ms", 25)
+                .Set("batch.num.messages", 64*1000)
                 .Set("queue.buffering.max.messages", 10000000)
                 .Set("queue.buffering.max.kbytes", 2097151)
                 .SetClientId("client-id");
