@@ -41,7 +41,7 @@ namespace KafkaLoadService.Core
         [HttpGet]
         public Task Load1000Async() => LoadAsync(100, 1000);
         [HttpGet]
-        public Task GenerateAsync() => LoadAsync(100, 1000, false);
+        public Task GenerateAsync() => LoadAsync(100, 10, false);
 
         [HttpGet]
         public Task LoadAsync(int requestCount, int bodySize) => LoadAsync(requestCount, bodySize, true);

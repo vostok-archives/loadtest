@@ -18,42 +18,40 @@ namespace LoadApp
         {
             var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("http://localhost:8888");
+            httpClient.Timeout = TimeSpan.FromSeconds(11);
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            
-            var tasks = Enumerable.Range(0, 30).Select(x => new Task(() =>
-            {
-                while (stopwatch.Elapsed < TimeSpan.FromSeconds(60))
-                { 
-                    var httpResponseMessage = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10")).Result;
-                    Interlocked.Increment(ref requestCount);
-                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
-                        Interlocked.Increment(ref successCount);
-                }
-            }))
-            .Concat(new[] {new Task(() =>
-                {
-                    int counter = 0;
-                    while (stopwatch.Elapsed < TimeSpan.FromSeconds(60))
-                    {
-                        var prevSuccess = successCount;
-                        Thread.Sleep(StepMilliseconds);
-                        counter++;
-                        var newSuccess = successCount;
-                        Console.WriteLine($"success = {successCount}, all = {requestCount}, perSecond={(double)(newSuccess-prevSuccess)/StepMilliseconds*1000},"+
-                            $" avg={(double)successCount/counter/StepMilliseconds*1000}");
-                    }
-                })})
-            .ToArray();
 
-            foreach (var task in tasks)
+            var printTask = new Task(() =>
             {
-                task.Start();
+                int counter = 0;
+                while (stopwatch.Elapsed < TimeSpan.FromSeconds(60))
+                {
+                    var prevSuccess = successCount;
+                    Thread.Sleep(StepMilliseconds);
+                    counter++;
+                    var newSuccess = successCount;
+                    Console.WriteLine($"success = {successCount}, all = {requestCount}, perSecond={(double)(newSuccess - prevSuccess) / StepMilliseconds * 1000}," +
+                                      $" avg={(double)successCount / counter / StepMilliseconds * 1000}");
+                }
+            });
+            printTask.Start();
+            while (stopwatch.Elapsed < TimeSpan.FromSeconds(60))
+            {
+                Enumerable.Range(0, 1000)
+                    .Select(x => LoadAsync(httpClient))
+                    .ToArray();
+                Thread.Sleep(StepMilliseconds);
             }
-            Task.WaitAll(tasks);
             Console.WriteLine($"success = {successCount}, all = {requestCount}");
         }
 
-
+        private static async Task LoadAsync(HttpClient httpClient)
+        {
+            Interlocked.Increment(ref requestCount);
+            var httpResponseMessage = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10")).ConfigureAwait(false);
+            if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                Interlocked.Increment(ref successCount);
+        }
     }
 }
