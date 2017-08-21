@@ -20,6 +20,8 @@ namespace KafkaLoadService.Core
                 .Set("message.max.bytes", 20*1000*1000)
                 .Set("queue.buffering.max.messages", 10000000)
                 .Set("queue.buffering.max.kbytes", 2097151)
+                .Set("message.copy.max.bytes", 10000000)
+                .Set("max.in.flight.requests.per.connection", 500)
                 .SetClientId("client-id");
             kafkaProducer = new KafkaProducer(kafkaSetting);
         }
