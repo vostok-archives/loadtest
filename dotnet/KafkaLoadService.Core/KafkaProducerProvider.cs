@@ -15,7 +15,7 @@ namespace KafkaLoadService.Core
                 .SetAcks(1)
                 .SetRetries(0)
                 .Set("queue.buffering.max.ms", 20)
-                .Set("socket.blocking.max.ms", 25)
+                .Set("socket.blocking.max.ms", 50)
                 .Set("batch.num.messages", 64*1000)
                 .Set("message.max.bytes", 20*1000*1000)
                 .Set("queue.buffering.max.messages", 10000000)
