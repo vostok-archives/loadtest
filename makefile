@@ -16,7 +16,7 @@ run-java-consumer: kill-java build-java
 	java ${JAVA_COMMON_PARAMS} consumer
 
 kill-java:
-	pgrep java | awk '{system("kill -9 "$1)}'
+	pgrep java | awk '{system("kill -9 "$$1)}'
 
 build-java: pull
 	mvn clean package
