@@ -38,13 +38,13 @@ public class KLoadEntryPoint {
         Schema schema = parser.parse(schemaString);
         if (args != null && args.length > 0) {
             String mode = args[0];
-            if (mode == "gate")
+            if (mode.equals("gate"))
                 RunHttpGate(props, schema);
-            else if (mode == "consumer")
+            else if (mode.equals("consumer"))
                 RunConsumer(props, schema);
             else
                 Log.error("KLoad mode is not recognized: " + mode);
-        }else{
+        } else {
             Log.error("KLoad mode is not specified");
         }
     }
