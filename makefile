@@ -1,4 +1,4 @@
-.PHONY: runjava buildjava rundotnet publishdotnet fire pull
+.PHONY: run-java-gate run-java-consumer build-java rundotnet publishdotnet fire pull
 
 MAXRPS=1000
 TESTDUR=1200
@@ -7,10 +7,15 @@ GATEPORT=8888
 LANG=Java
 REV=$(shell git rev-parse --short HEAD)
 
-runjava: buildjava
-	java -Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar ./target/uber-kload-1.0-SNAPSHOT.jar
+JAVA_COMMON_PARAMS = -Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar ./target/uber-kload-1.0-SNAPSHOT.jar
 
-buildjava: pull
+run-java-gate: build-java
+	java ${JAVA_COMMON_PARAMS} gate
+
+run-java-consumer: build-java
+	java ${JAVA_COMMON_PARAMS} consumer
+
+build-java: pull
 	mvn clean package
 
 rundotnet: publishdotnet

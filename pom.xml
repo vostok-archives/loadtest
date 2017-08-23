@@ -79,7 +79,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>HttpGateEntryPoint</mainClass>
+                            <mainClass>KLoadEntryPoint</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -2,13 +2,15 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.rapidoid.log.Log;
 import org.rapidoid.net.Server;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-public class HttpGateEntryPoint {
+public class KLoadEntryPoint {
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
@@ -32,9 +34,28 @@ public class HttpGateEntryPoint {
                 "{\"name\": \"timestamp\", \"type\": \"long\"}," +
                 "{\"name\": \"payload\", \"type\": \"bytes\"}" +
                 "]}";
-        Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse(schemaString);
+        if (args != null && args.length > 0) {
+            String mode = args[0];
+            if (mode == "gate")
+                RunHttpGate(props, schema);
+            else if (mode == "consumer")
+                RunConsumer(props, schema);
+            else
+                Log.error("KLoad mode is not recognized: " + mode);
+        }else{
+            Log.error("KLoad mode is not specified");
+        }
+    }
+
+    private static void RunConsumer(Properties props, Schema schema) {
+        Log.info("Starting consumer");
+    }
+
+    private static void RunHttpGate(Properties props, Schema schema) throws IOException {
+        Log.info("Starting http gate");
+        Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
         Server server = new KHttpServer(schema, producer).listen(8888);
         new BufferedReader(new InputStreamReader(System.in)).readLine();
         server.shutdown();
