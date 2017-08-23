@@ -47,8 +47,6 @@ public class KLoadEntryPoint {
     }
 
     private static void RunConsumer(Properties props, Schema schema, String topic) {
-        Logger.getLogger("kafka").setLevel(Level.INFO);
-
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup" + System.currentTimeMillis());
