@@ -22,7 +22,7 @@ namespace ConsumerTest
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine($"diff: {DiffTimestampManager.Diff.TotalMilliseconds} ms");
+                Console.WriteLine(DiffTimestampManager.GetReport());
                 Thread.Sleep(TimeSpan.FromMilliseconds(500));
             }
 
@@ -55,7 +55,7 @@ namespace ConsumerTest
         public void OnNext(TestKaskaModel value)
         {
             var now = DateTime.Now;
-            DiffTimestampManager.Diff = now - new DateTime(1970, 01, 01) - TimeSpan.FromMilliseconds(value.Timestamp);
+            DiffTimestampManager.SetTimestamp(value.Timestamp);
         }
     }
 
@@ -70,18 +70,24 @@ namespace ConsumerTest
 
     public static class DiffTimestampManager
     {
-        private static TimeSpan diff;
+        private static DateTime Now;
+        private static long timestamp;
+        private static int counter;
         private static object lockObject = new object();
-        public static TimeSpan Diff
+
+        public static void SetTimestamp(long timestampInMilliseconds)
         {
-            get => diff;
-            set
+            lock (lockObject)
             {
-                lock (lockObject)
-                {
-                    diff = value;
-                }
+                Now = DateTime.Now;
+                timestamp = timestampInMilliseconds;
+                counter++;
             }
+        }
+
+        public static string GetReport()
+        {
+            return $"now: {Now}, now milliseconds:{(Now - new DateTime(1970, 01, 01)).TotalMilliseconds}, timestamp: {timestamp}, count: {counter}";
         }
     }
 }
