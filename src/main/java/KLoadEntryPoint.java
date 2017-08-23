@@ -48,7 +48,7 @@ public class KLoadEntryPoint {
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup");
-        props.put("auto.offset.reset", "earliest");
+        props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
         props.put("session.timeout.ms", "60000");
