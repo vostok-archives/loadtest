@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 public class KLoadEntryPoint {
 
     public static void main(String[] args) throws Exception {
+        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
+
         Properties props = new Properties();
         props.put("bootstrap.servers", "icat-test01:9092");
         props.put("schema.registry.url", "http://icat-test01:8881");
