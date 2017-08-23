@@ -1,4 +1,4 @@
-.PHONY: run-java-gate run-java-consumer build-java rundotnet publishdotnet fire pull
+.PHONY: run-java-gate run-java-consumer kill-java build-java rundotnet publishdotnet fire pull
 
 MAXRPS=1000
 TESTDUR=1200
@@ -9,11 +9,14 @@ REV=$(shell git rev-parse --short HEAD)
 
 JAVA_COMMON_PARAMS = -Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar ./target/uber-kload-1.0-SNAPSHOT.jar
 
-run-java-gate: build-java
+run-java-gate: kill-java build-java
 	java ${JAVA_COMMON_PARAMS} gate
 
-run-java-consumer: build-java
+run-java-consumer: kill-java build-java
 	java ${JAVA_COMMON_PARAMS} consumer
+
+kill-java:
+	pgrep java | awk '{system("kill -9 "$1)}'
 
 build-java: pull
 	mvn clean package
