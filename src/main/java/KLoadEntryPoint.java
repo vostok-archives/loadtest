@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class KLoadEntryPoint {
 
@@ -61,7 +62,7 @@ public class KLoadEntryPoint {
                 long currentTimestamp = System.currentTimeMillis();
                 for (ConsumerRecord<String, GenericRecord> record : records) {
                     long travelTime = currentTimestamp - (long) record.value().get("timestamp");
-                    Log.info("[" + record.partition() + ":" + record.offset() + "]: " + record.value() + " (tt = " + travelTime + " ms)");
+                    Log.info("[" + record.partition() + ":" + record.offset() + "]: " + record.value() + " (tt = " + formatDuration(travelTime) + ")");
                 }
             }
         } catch (WakeupException e) {
@@ -69,6 +70,14 @@ public class KLoadEntryPoint {
         } finally {
             consumer.close();
         }
+    }
+
+    private static String formatDuration(long durationMillis) {
+        long totalMinutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis);
+        long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis);
+        long seconds = totalSeconds - TimeUnit.MINUTES.toSeconds(totalMinutes);
+        long millis = durationMillis - TimeUnit.SECONDS.toMillis(totalSeconds);
+        return String.format("%d:%02d:%03d", totalMinutes, seconds, millis);
     }
 
     private static void RunHttpGate(Properties props, Schema schema, String topic) throws IOException {
