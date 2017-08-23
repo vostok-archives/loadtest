@@ -55,7 +55,7 @@ namespace ConsumerTest
         public void OnNext(TestKaskaModel value)
         {
             var now = DateTime.Now;
-            DiffTimestampManager.Diff = now - new DateTime(value.Timestamp);
+            DiffTimestampManager.Diff = now - new DateTime(1970, 01, 01) - TimeSpan.FromMilliseconds(value.Timestamp);
         }
     }
 
