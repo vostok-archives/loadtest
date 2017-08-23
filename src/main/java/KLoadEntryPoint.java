@@ -15,12 +15,12 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class KLoadEntryPoint {
 
     public static void main(String[] args) throws Exception {
-        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
-
         Properties props = new Properties();
         props.put("bootstrap.servers", "icat-test01:9092");
         props.put("schema.registry.url", "http://icat-test01:8881");
@@ -47,6 +47,8 @@ public class KLoadEntryPoint {
     }
 
     private static void RunConsumer(Properties props, Schema schema, String topic) {
+        Logger.getLogger("kafka").setLevel(Level.INFO);
+
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup" + System.currentTimeMillis());
