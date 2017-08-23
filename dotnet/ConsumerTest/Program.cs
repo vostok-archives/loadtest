@@ -13,7 +13,7 @@ namespace ConsumerTest
         static void Main(string[] args)
         {
             var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://localhost:9092"))
+                .SetBootstrapServers(new Uri("http://icat-test01:9092"))
                 .SetGroupId("test-group");
 
             var kafkaConsumer = new KafkaConsumer<TestKaskaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKaskaModel>(), new MessageObserver());
