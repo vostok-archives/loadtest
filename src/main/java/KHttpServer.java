@@ -26,14 +26,16 @@ public class KHttpServer extends AbstractHttpServer {
     private static final byte[] HELLO_WORLD = "Hello, World!".getBytes();
     private final Schema schema;
     private final Producer<String, GenericRecord> producer;
+    private final String topic;
     private byte[] randomBytesSource;
 
-    KHttpServer(Schema schema, Producer<String, GenericRecord> producer) {
+    KHttpServer(Schema schema, Producer<String, GenericRecord> producer, String topic) {
         this.schema = schema;
         this.producer = producer;
         Random random = new Random(UUID.randomUUID().hashCode());
         this.randomBytesSource = new byte[Integer.MAX_VALUE - 5];
         random.nextBytes(randomBytesSource);
+        this.topic = topic;
     }
 
     @Override
@@ -68,7 +70,7 @@ public class KHttpServer extends AbstractHttpServer {
             GenericRecord kevent = new GenericData.Record(schema);
             kevent.put("timestamp", timestamp);
             kevent.put("payload", generatePayload(eventSize));
-            ProducerRecord<String, GenericRecord> data = new ProducerRecord<>("ktopic-with-ts", kevent);
+            ProducerRecord<String, GenericRecord> data = new ProducerRecord<>(topic, kevent);
             if (publishToKafka)
                 producer.send(data);
         }

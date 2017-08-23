@@ -9,10 +9,10 @@ REV=$(shell git rev-parse --short HEAD)
 
 JAVA_COMMON_PARAMS = -Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar ./target/uber-kload-1.0-SNAPSHOT.jar
 
-run-java-gate: kill-java build-java
+run-java-gate: build-java
 	java ${JAVA_COMMON_PARAMS} gate
 
-run-java-consumer: kill-java build-java
+run-java-consumer: build-java
 	java ${JAVA_COMMON_PARAMS} consumer
 
 kill-java:
