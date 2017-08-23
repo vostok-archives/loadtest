@@ -47,7 +47,7 @@ public class KLoadEntryPoint {
     private static void RunConsumer(Properties props, Schema schema, String topic) {
         Log.info("Starting consumer");
 
-        props.put("group.id", "kgroup");
+        props.put("group.id", "kgroup" + System.currentTimeMillis());
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
