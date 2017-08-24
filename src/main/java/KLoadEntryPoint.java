@@ -62,7 +62,7 @@ public class KLoadEntryPoint {
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
         //consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
         consumer.subscribe(Arrays.asList(topic));
-        long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(30);
+        long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(300);
         for (int partition : Arrays.asList(0, 1, 2)) {
             TopicPartition topicPartition = new TopicPartition(topic, partition);
             OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
