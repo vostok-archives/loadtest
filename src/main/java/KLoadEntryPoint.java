@@ -56,7 +56,8 @@ public class KLoadEntryPoint {
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
-        props.put("session.timeout.ms", "60000");
+        props.put("session.timeout.ms", 60000);
+        props.put("max.poll.records", 64 * 1000);
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
 
