@@ -52,7 +52,7 @@ public class KLoadEntryPoint {
     private static void RunConsumer(Properties props, Schema schema, String topic) {
         Log.info("Starting consumer");
 
-        props.put("group.id", "kgroup" + System.currentTimeMillis());
+        props.put("group.id", "kgroup");
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
@@ -60,16 +60,16 @@ public class KLoadEntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
-        //consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
-        consumer.subscribe(Arrays.asList(topic));
-        long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(300);
+        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 600));
+        //consumer.subscribe(Arrays.asList(topic));
+        /*long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(300);
         for (int partition : Arrays.asList(0, 1, 2)) {
             TopicPartition topicPartition = new TopicPartition(topic, partition);
             OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
             Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
             if (offsetAndTimestamp != null)
                 consumer.seek(topicPartition, offsetAndTimestamp.offset());
-        }
+        }*/
         try {
             while (true) {
                 ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
@@ -155,9 +155,11 @@ public class KLoadEntryPoint {
 
         public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
             long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(seconds);
-            for (TopicPartition partition : partitions) {
-                long offset = consumer.offsetsForTimes(Collections.singletonMap(partition, startTimestamp)).get(partition).offset();
-                consumer.seek(partition, offset);
+            for (TopicPartition topicPartition : partitions) {
+                OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
+                Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
+                if (offsetAndTimestamp != null)
+                    consumer.seek(topicPartition, offsetAndTimestamp.offset());
             }
         }
     }
