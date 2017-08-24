@@ -16,7 +16,7 @@ namespace ConsumerTest
                 .SetBootstrapServers(new Uri("http://icat-test01:9092"))
                 .SetGroupId("test-group2");
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new MessageObserver());
+            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new MessageObserver());
 
 
             var cancellationToken = new CancellationToken();
