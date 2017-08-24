@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -6,27 +9,50 @@ using Confluent.Kafka.Serialization;
 
 namespace KafkaClient
 {
+    public class SimpleDesiralizer : IDeserializer<byte[]>
+    {
+        public byte[] Deserialize(byte[] data)
+        {
+            return data;
+        }
+    }
+
     public class KafkaConsumer<T> : IDisposable
     {
-        private readonly Consumer<Null, T> consumer;
+        private readonly Consumer<byte[], T> consumer;
+        private readonly CancellationTokenSource cancellationTokenSource;
 
         public KafkaConsumer(KafkaSetting kafkaSetting, string topic, IDeserializer<T> deserializer, IObserver<T> observer)
         {
             var settings = kafkaSetting.ToDictionary();
-            consumer = new Consumer<Null, T>(settings, new NullDeserializer(), deserializer);
+            consumer = new Consumer<byte[], T>(settings, new SimpleDesiralizer(), deserializer);
             consumer.OnMessage += (s, e) => observer.OnNext(e.Value);
             consumer.OnError += (s, e) => observer.OnError(new Exception(e.Reason));
             consumer.OnConsumeError += (s, e) => observer.OnError(new Exception(e.Error.Reason));
             consumer.OnPartitionsAssigned += (s, e) =>
             {
-                consumer.Assign(e.Select(x => new TopicPartitionOffset(x, Offset.Beginning)));
+                Console.WriteLine($"Assigned partitions: [{string.Join(", ", e)}], member id: {consumer.MemberId}");
+                consumer.Assign(e);
+            };
+            consumer.OnPartitionsRevoked += (_, e) =>
+            {
+                Console.WriteLine($"Revoked partitions: [{string.Join(", ", e)}]");
+                consumer.Unassign();
             };
 
+            //consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(topic, 0, 0) });
+            cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
             consumer.Subscribe(topic);
             new Task(() =>
             {
-                while (true)
+                while (!cancellationToken.IsCancellationRequested)
                 {
+                    //Message<byte[], T> msg;
+                    //if (consumer.Consume(out msg, 1000))
+                    //{
+                    //    observer.OnNext(msg.Value);
+                    //}
                     consumer.Poll(100);
                 }
             }).Start();
@@ -34,6 +60,7 @@ namespace KafkaClient
 
         public void Dispose()
         {
+            cancellationTokenSource.Cancel();
             consumer?.Dispose();
         }
     }
