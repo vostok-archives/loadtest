@@ -88,7 +88,8 @@ public class KLoadEntryPoint {
                             + " key=" + lastRecord.key()
                             + " v.ts=" + lastRecord.value().get("timestamp")
                             + " v.size=" + lastRecord.serializedValueSize()
-                            + " tt=" + formatDuration(travelTime));
+                            + " tt=" + formatDuration(travelTime)
+                            + " RC=" + records.count());
                 }
             } catch (WakeupException e) {
                 // ignore for shutdown via consumer.wakeup()
