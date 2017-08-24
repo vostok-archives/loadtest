@@ -58,7 +58,10 @@ namespace ConsumerTest
                 using (var memoryStream = new MemoryStream(data))
                 {
                     dynamic result = avroSerializer.Deserialize(memoryStream);
-                    Console.WriteLine(result.GetType());
+                    Type type = result.GetType();
+                    var fieldsString = string.Join(",", type.GetFields().Select(x => x.Name).ToArray());
+                    var methodsString = string.Join(",", type.GetMethods().Select(x => x.Name).ToArray());
+                    Console.WriteLine($"type: {type}, fields: {fieldsString}, methods: {methodsString}");
                     return new TestKafkaModel
                     {
                         Timestamp = result["timestamp"],
