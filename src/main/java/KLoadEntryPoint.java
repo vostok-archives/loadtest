@@ -67,12 +67,12 @@ public class KLoadEntryPoint {
             Log.info("Termination requested");
             consumer.wakeup();
             synchronized (lock) {
-                Log.info("Lock acquired");
+                Log.info("Lock acquired"); // it's essential to do something inside synchronized block!
             }
             Log.info("Now exiting");
         }));
 
-        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 10));
+        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
         synchronized (lock) {
             try {
                 while (true) {
