@@ -59,8 +59,10 @@ namespace ConsumerTest
                 {
                     dynamic result = avroSerializer.Deserialize(memoryStream);
                     Type type = result.GetType();
-                    var fieldsString = string.Join(",", type.GetFields().Select(x => x.Name).ToArray());
-                    var methodsString = string.Join(",", type.GetMethods().Select(x => x.Name).ToArray());
+                    var fieldInfos = type.GetFields();
+                    var fieldsString = string.Join(",", fieldInfos.Select(x => x.Name).ToArray());
+                    var methodInfos = type.GetMethods();
+                    var methodsString = string.Join(",", methodInfos.Select(x => x.Name).ToArray());
                     Console.WriteLine($"type: {type}, fields: {fieldsString}, methods: {methodsString}");
                     return new TestKafkaModel
                     {
