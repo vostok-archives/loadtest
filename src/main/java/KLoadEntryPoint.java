@@ -60,16 +60,7 @@ public class KLoadEntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 600));
-        //consumer.subscribe(Arrays.asList(topic));
-        /*long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(300);
-        for (int partition : Arrays.asList(0, 1, 2)) {
-            TopicPartition topicPartition = new TopicPartition(topic, partition);
-            OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
-            Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
-            if (offsetAndTimestamp != null)
-                consumer.seek(topicPartition, offsetAndTimestamp.offset());
-        }*/
+        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 10));
         try {
             while (true) {
                 ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
@@ -157,9 +148,15 @@ public class KLoadEntryPoint {
             long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(seconds);
             for (TopicPartition topicPartition : partitions) {
                 OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
-                Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
-                if (offsetAndTimestamp != null)
-                    consumer.seek(topicPartition, offsetAndTimestamp.offset());
+                long offset;
+                if (offsetAndTimestamp != null) {
+                    offset = offsetAndTimestamp.offset();
+                    Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
+                } else {
+                    offset = consumer.endOffsets(Arrays.asList(topicPartition)).get(topicPartition);
+                    Log.info("Rewind consumer for " + topicPartition + " to the end");
+                }
+                consumer.seek(topicPartition, offset);
             }
         }
     }
