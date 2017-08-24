@@ -64,8 +64,10 @@ public class KLoadEntryPoint {
 
         Object lock = new Object();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Log.info("Termination requested");
             consumer.wakeup();
             synchronized (lock) {
+                Log.info("Lock acquired");
             }
             Log.info("Now exiting");
         }));
@@ -90,9 +92,10 @@ public class KLoadEntryPoint {
                 }
             } catch (WakeupException e) {
                 // ignore for shutdown via consumer.wakeup()
+                Log.info("Consumer waked up");
             } finally {
                 consumer.close();
-                Log.info("Consumer stopped");
+                Log.info("Consumer closed");
             }
         }
     }
