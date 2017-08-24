@@ -13,16 +13,16 @@ namespace ConsumerTest
         static void Main(string[] args)
         {
             var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://icat-test01:9092"))
-                .SetGroupId("test-group");
+                .SetBootstrapServers(new Uri("http://localhost:9092"))
+                .SetGroupId("test-group2");
 
-            var kafkaConsumer = new KafkaConsumer<TestKaskaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKaskaModel>(), new MessageObserver());
+            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new MessageObserver());
 
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine(DiffTimestampManager.GetReport());
+                Console.WriteLine(TimestampInfoManager.GetReport());
                 Thread.Sleep(TimeSpan.FromMilliseconds(500));
             }
 
@@ -42,7 +42,30 @@ namespace ConsumerTest
         }
     }
 
-    public class MessageObserver : IObserver<TestKaskaModel>
+    public class AvroTestKafkaModelDeserializer : IDeserializer<TestKafkaModel>
+    {
+        public TestKafkaModel Deserialize(byte[] data)
+        {
+            var schemaString = "{\"type\": \"record\", " +
+                                  "\"name\": \"kevent\"," +
+                                  "\"fields\": [" +
+                                  "{\"name\": \"timestamp\", \"type\": \"long\"}," +
+                                  "{\"name\": \"payload\", \"type\": \"bytes\"}" +
+                                  "]}";
+            var avroSerializer = AvroSerializer.CreateGeneric(schemaString);
+            using (var memoryStream = new MemoryStream(data))
+            {
+                dynamic result = avroSerializer.Deserialize(memoryStream);
+                return new TestKafkaModel
+                {
+                    Timestamp = result.timestamp,
+                    Payload = result.payload
+                };
+            }
+        }
+    }
+
+    public class MessageObserver : IObserver<TestKafkaModel>
     {
         public void OnCompleted()
         { }
@@ -52,15 +75,14 @@ namespace ConsumerTest
             Console.WriteLine(error);
         }
 
-        public void OnNext(TestKaskaModel value)
+        public void OnNext(TestKafkaModel value)
         {
-            var now = DateTime.Now;
-            DiffTimestampManager.SetTimestamp(value.Timestamp);
+            TimestampInfoManager.SetTimestamp(value.Timestamp);
         }
     }
 
     [DataContract(Name = "record")]
-    public class TestKaskaModel
+    public class TestKafkaModel
     {
         [DataMember(Name = "timestamp")]
         public long Timestamp { get; set; }
@@ -68,18 +90,18 @@ namespace ConsumerTest
         public byte[] Payload { get; set; }
     }
 
-    public static class DiffTimestampManager
+    public static class TimestampInfoManager
     {
-        private static DateTime Now;
+        private static DateTime now;
         private static long timestamp;
         private static int counter;
-        private static object lockObject = new object();
+        private static readonly object lockObject = new object();
 
         public static void SetTimestamp(long timestampInMilliseconds)
         {
             lock (lockObject)
             {
-                Now = DateTime.Now;
+                now = DateTime.Now;
                 timestamp = timestampInMilliseconds;
                 counter++;
             }
@@ -87,7 +109,7 @@ namespace ConsumerTest
 
         public static string GetReport()
         {
-            return $"now: {Now}, now milliseconds:{(Now - new DateTime(1970, 01, 01)).TotalMilliseconds}, timestamp: {timestamp}, count: {counter}";
+            return $"now: {now}, now milliseconds:{(now - new DateTime(1970, 01, 01)).TotalMilliseconds}, timestamp: {timestamp}, count: {counter}";
         }
     }
 }
