@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
 using Microsoft.Hadoop.Avro;
-using Newtonsoft.Json;
 
 namespace ConsumerTest
 {
@@ -18,7 +16,7 @@ namespace ConsumerTest
                 .SetBootstrapServers(new Uri("http://icat-test01:9092"))
                 .SetGroupId("test-group2");
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new MessageObserver());
+            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new MessageObserver());
 
 
             var cancellationToken = new CancellationToken();
@@ -61,19 +59,6 @@ namespace ConsumerTest
                 {
                     dynamic result = avroSerializer.Deserialize(memoryStream);
 
-                    var jsonSerializer = new JsonSerializer();
-
-                    using (var stream = new MemoryStream())
-                    {
-                        using (var streamWriter = new StreamWriter(stream))
-                        {
-                            using (var jsonTextWriter = new JsonTextWriter(streamWriter))
-                            {
-                                jsonSerializer.Serialize(jsonTextWriter, result);
-                            }
-                        }
-                        Console.WriteLine(Encoding.UTF8.GetString(stream.ToArray()));
-                    }
                     return new TestKafkaModel
                     {
                         Timestamp = result["timestamp"],
@@ -105,7 +90,7 @@ namespace ConsumerTest
         }
     }
 
-    [DataContract(Name = "record")]
+    [DataContract(Name = "kevent")]
     public class TestKafkaModel
     {
         [DataMember(Name = "timestamp")]
