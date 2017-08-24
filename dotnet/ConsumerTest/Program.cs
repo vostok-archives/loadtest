@@ -53,14 +53,22 @@ namespace ConsumerTest
                                   "{\"name\": \"payload\", \"type\": \"bytes\"}" +
                                   "]}";
             var avroSerializer = AvroSerializer.CreateGeneric(schemaString);
-            using (var memoryStream = new MemoryStream(data))
+            try
             {
-                dynamic result = avroSerializer.Deserialize(memoryStream);
-                return new TestKafkaModel
+                using (var memoryStream = new MemoryStream(data))
                 {
-                    Timestamp = result.timestamp,
-                    Payload = result.payload
-                };
+                    dynamic result = avroSerializer.Deserialize(memoryStream);
+                    return new TestKafkaModel
+                    {
+                        Timestamp = result.timestamp,
+                        Payload = result.payload
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }
