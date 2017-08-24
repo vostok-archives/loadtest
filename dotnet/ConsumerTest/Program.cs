@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
 using Microsoft.Hadoop.Avro;
+using Newtonsoft.Json;
 
 namespace ConsumerTest
 {
@@ -58,6 +60,20 @@ namespace ConsumerTest
                 using (var memoryStream = new MemoryStream(data))
                 {
                     dynamic result = avroSerializer.Deserialize(memoryStream);
+
+                    var jsonSerializer = new JsonSerializer();
+
+                    using (var stream = new MemoryStream())
+                    {
+                        using (var streamWriter = new StreamWriter(stream))
+                        {
+                            using (var jsonTextWriter = new JsonTextWriter(streamWriter))
+                            {
+                                jsonSerializer.Serialize(jsonTextWriter, result);
+                            }
+                        }
+                        Console.WriteLine(Encoding.UTF8.GetString(stream.ToArray()));
+                    }
                     return new TestKafkaModel
                     {
                         Timestamp = result["timestamp"],
