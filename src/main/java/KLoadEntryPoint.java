@@ -58,6 +58,10 @@ public class KLoadEntryPoint {
         props.put("auto.commit.interval.ms", 1000);
         props.put("session.timeout.ms", 60000);
         props.put("max.poll.records", 64 * 1000);
+        props.put("max.partition.fetch.bytes", 1048576);
+        props.put("fetch.min.bytes", 1);
+        props.put("fetch.max.bytes", 52428800);
+        props.put("fetch.max.wait.ms", 500);
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
 
