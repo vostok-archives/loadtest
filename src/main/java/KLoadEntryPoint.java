@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.record.TimestampType;
 import org.rapidoid.log.Log;
 import org.rapidoid.net.Server;
 
@@ -79,10 +80,10 @@ public class KLoadEntryPoint {
                 }
                 long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
                 Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
-                        + " ts=" + lastRecord.timestamp() + " " + lastRecord.timestampType()
+                        + " ts=" + formatTimestamp(lastRecord)
                         + " key=" + lastRecord.key()
-                        + " value.ts=" + lastRecord.value().get("timestamp")
-                        + " value.size=" + lastRecord.serializedValueSize()
+                        + " v.ts=" + lastRecord.value().get("timestamp")
+                        + " v.size=" + lastRecord.serializedValueSize()
                         + " tt=" + formatDuration(travelTime));
             }
         } catch (WakeupException e) {
@@ -90,6 +91,23 @@ public class KLoadEntryPoint {
         } finally {
             consumer.close();
         }
+    }
+
+    private static String formatTimestamp(ConsumerRecord<String, GenericRecord> lastRecord) {
+        TimestampType timestampType = lastRecord.timestampType();
+        String timestampTypeStr = null;
+        switch (timestampType) {
+            case NO_TIMESTAMP_TYPE:
+                timestampTypeStr = "NONE";
+                break;
+            case CREATE_TIME:
+                timestampTypeStr = "CT";
+                break;
+            case LOG_APPEND_TIME:
+                timestampTypeStr = "LAT";
+                break;
+        }
+        return lastRecord.timestamp() + " " + timestampTypeStr;
     }
 
     private static String formatDuration(long durationMillis) {
