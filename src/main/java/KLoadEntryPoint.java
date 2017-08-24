@@ -36,12 +36,13 @@ public class KLoadEntryPoint {
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse(schemaString);
         String topic = "ktopic-with-ts";
+        KThroughputMeter throughputMeter = new KThroughputMeter(5);
         if (args != null && args.length > 0) {
             String mode = args[0];
             if (mode.equals("gate"))
-                RunHttpGate(props, schema, topic);
+                RunHttpGate(props, schema, topic, throughputMeter);
             else if (mode.equals("consumer"))
-                RunConsumer(props, schema, topic);
+                RunConsumer(props, schema, topic, throughputMeter);
             else
                 Log.error("KLoad mode is not recognized: " + mode);
         } else {
@@ -49,7 +50,7 @@ public class KLoadEntryPoint {
         }
     }
 
-    private static void RunConsumer(Properties props, Schema schema, String topic) {
+    private static void RunConsumer(Properties props, Schema schema, String topic, KThroughputMeter throughputMeter) {
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup");
@@ -95,6 +96,7 @@ public class KLoadEntryPoint {
                             + " v.size=" + lastRecord.serializedValueSize()
                             + " tt=" + formatDuration(travelTime)
                             + " RC=" + records.count());
+                    throughputMeter.increment(records.count());
                 }
             } catch (WakeupException e) {
                 // ignore for shutdown via consumer.wakeup()
@@ -131,7 +133,7 @@ public class KLoadEntryPoint {
         return String.format("%d:%02d:%03d", totalMinutes, seconds, millis);
     }
 
-    private static void RunHttpGate(Properties props, Schema schema, String topic) throws IOException {
+    private static void RunHttpGate(Properties props, Schema schema, String topic, KThroughputMeter throughputMeter) throws IOException {
         Log.info("Starting http gate");
 
         props.put("acks", "1");
@@ -148,7 +150,7 @@ public class KLoadEntryPoint {
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 
         Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
-        Server server = new KHttpServer(schema, producer, topic).listen(8888);
+        Server server = new KHttpServer(schema, producer, topic, throughputMeter, 100).listen(8888);
         new BufferedReader(new InputStreamReader(System.in)).readLine();
         server.shutdown();
         producer.close();
