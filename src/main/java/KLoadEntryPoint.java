@@ -59,28 +59,41 @@ public class KLoadEntryPoint {
         props.put("session.timeout.ms", "60000");
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 10));
-        try {
-            while (true) {
-                ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
-                long currentTimestamp = System.currentTimeMillis();
-                ConsumerRecord<String, GenericRecord> lastRecord = null;
-                for (ConsumerRecord<String, GenericRecord> record : records) {
-                    lastRecord = record;
-                }
-                long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
-                Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
-                        + " ts=" + formatTimestamp(lastRecord)
-                        + " key=" + lastRecord.key()
-                        + " v.ts=" + lastRecord.value().get("timestamp")
-                        + " v.size=" + lastRecord.serializedValueSize()
-                        + " tt=" + formatDuration(travelTime));
+
+        Object lock = new Object();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            consumer.wakeup();
+            synchronized (lock) {
             }
-        } catch (WakeupException e) {
-            // ignore for shutdown via consumer.wakeup()
-        } finally {
-            consumer.close();
+            Log.info("Now exiting");
+        }));
+
+        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 10));
+        synchronized (lock) {
+            try {
+                while (true) {
+                    ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
+                    long currentTimestamp = System.currentTimeMillis();
+                    ConsumerRecord<String, GenericRecord> lastRecord = null;
+                    for (ConsumerRecord<String, GenericRecord> record : records) {
+                        lastRecord = record;
+                    }
+                    long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
+                    Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
+                            + " ts=" + formatTimestamp(lastRecord)
+                            + " key=" + lastRecord.key()
+                            + " v.ts=" + lastRecord.value().get("timestamp")
+                            + " v.size=" + lastRecord.serializedValueSize()
+                            + " tt=" + formatDuration(travelTime));
+                }
+            } catch (WakeupException e) {
+                // ignore for shutdown via consumer.wakeup()
+            } finally {
+                consumer.close();
+                Log.info("Consumer stopped");
+            }
         }
     }
 
