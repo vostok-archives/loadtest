@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using Confluent.Kafka.Serialization;
@@ -13,7 +14,7 @@ namespace ConsumerTest
         static void Main(string[] args)
         {
             var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://icat-test01:9092"))
+                .SetBootstrapServers(new Uri("http://localhost:9092"))
                 .SetGroupId("test-group2");
 
             var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new MessageObserver());
@@ -58,16 +59,10 @@ namespace ConsumerTest
                 using (var memoryStream = new MemoryStream(data))
                 {
                     dynamic result = avroSerializer.Deserialize(memoryStream);
-                    Type type = result.GetType();
-                    var fieldInfos = type.GetFields();
-                    var fieldsString = string.Join(",", fieldInfos.Select(x => x.Name).ToArray());
-                    var methodInfos = type.GetMethods();
-                    var methodsString = string.Join(",", methodInfos.Select(x => x.Name).ToArray());
-                    Console.WriteLine($"type: {type}, fields: {fieldsString}, methods: {methodsString}");
                     return new TestKafkaModel
                     {
-                        Timestamp = result["timestamp"],
-                        Payload = result["payload"]
+                        Timestamp = result["Timestamp"],
+                        Payload = result["Payload"]
                     };
                 }
             }
