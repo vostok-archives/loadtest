@@ -60,8 +60,8 @@ namespace ConsumerTest
                     dynamic result = avroSerializer.Deserialize(memoryStream);
                     return new TestKafkaModel
                     {
-                        Timestamp = result.timestamp,
-                        Payload = result.payload
+                        Timestamp = result["timestamp"],
+                        Payload = result["payload"]
                     };
                 }
             }
