@@ -1,10 +1,10 @@
+import ch.qos.logback.classic.Level;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.rapidoid.log.Log;
 import org.rapidoid.net.Server;
@@ -13,14 +13,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class KLoadEntryPoint {
 
     public static void main(String[] args) throws Exception {
+        ((ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("org.apache.kafka")).setLevel(Level.INFO);
+
         Properties props = new Properties();
         props.put("bootstrap.servers", "icat-test01:9092");
         props.put("schema.registry.url", "http://icat-test01:8881");
@@ -49,7 +51,7 @@ public class KLoadEntryPoint {
     private static void RunConsumer(Properties props, Schema schema, String topic) {
         Log.info("Starting consumer");
 
-        props.put("group.id", "kgroup" + System.currentTimeMillis());
+        props.put("group.id", "kgroup");
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
@@ -57,15 +59,17 @@ public class KLoadEntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(topic));
+        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
         try {
             while (true) {
                 ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
                 long currentTimestamp = System.currentTimeMillis();
+                ConsumerRecord<String, GenericRecord> lastRecord = null;
                 for (ConsumerRecord<String, GenericRecord> record : records) {
-                    long travelTime = currentTimestamp - (long) record.value().get("timestamp");
-                    Log.info("[" + record.partition() + ":" + record.offset() + "]: " + record.value() + " (tt = " + formatDuration(travelTime) + ")");
+                    lastRecord = record;
                 }
+                long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
+                Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]: " + lastRecord.value() + " (tt = " + formatDuration(travelTime) + ")");
             }
         } catch (WakeupException e) {
             // ignore for shutdown via consumer.wakeup()
@@ -103,5 +107,26 @@ public class KLoadEntryPoint {
         new BufferedReader(new InputStreamReader(System.in)).readLine();
         server.shutdown();
         producer.close();
+    }
+
+    public static class GoBackOnRebalance implements ConsumerRebalanceListener {
+        private final int seconds;
+        private Consumer<?, ?> consumer;
+
+        public GoBackOnRebalance(Consumer<?, ?> consumer, int seconds) {
+            this.consumer = consumer;
+            this.seconds = seconds;
+        }
+
+        public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+        }
+
+        public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+            long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(seconds);
+            for (TopicPartition partition : partitions) {
+                long offset = consumer.offsetsForTimes(Collections.singletonMap(partition, startTimestamp)).get(partition).offset();
+                consumer.seek(partition, offset);
+            }
+        }
     }
 }
