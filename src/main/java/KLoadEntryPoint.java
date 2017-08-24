@@ -59,7 +59,15 @@ public class KLoadEntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         KafkaConsumer<String, GenericRecord> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
+        //consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, 30));
+        consumer.subscribe(Arrays.asList(topic));
+        long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(30);
+        for (int partition : Arrays.asList(0, 1, 2)) {
+            TopicPartition topicPartition = new TopicPartition(topic, partition);
+            OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
+            Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
+            consumer.seek(topicPartition, offsetAndTimestamp.offset());
+        }
         try {
             while (true) {
                 ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
