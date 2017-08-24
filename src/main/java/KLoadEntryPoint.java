@@ -78,7 +78,12 @@ public class KLoadEntryPoint {
                     lastRecord = record;
                 }
                 long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
-                Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]: " + lastRecord.value() + " (tt = " + formatDuration(travelTime) + ")");
+                Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
+                        + " ts=" + lastRecord.timestamp() + " " + lastRecord.timestampType()
+                        + " key=" + lastRecord.key()
+                        + " value.ts=" + lastRecord.value().get("timestamp")
+                        + " value.size=" + lastRecord.serializedValueSize()
+                        + " tt=" + formatDuration(travelTime));
             }
         } catch (WakeupException e) {
             // ignore for shutdown via consumer.wakeup()
