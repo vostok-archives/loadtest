@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
@@ -18,7 +19,7 @@ namespace KafkaClient
             consumer.OnConsumeError += (s, e) => observer.OnError(new Exception(e.Error.Reason));
             consumer.OnPartitionsAssigned += (s, e) =>
             {
-                consumer.Assign(e);
+                consumer.Assign(e.Select(x => new TopicPartitionOffset(x, Offset.Beginning)));
             };
 
             consumer.Subscribe(topic);
