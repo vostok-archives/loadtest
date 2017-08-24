@@ -51,7 +51,7 @@ public class KLoadEntryPoint {
     private static void RunConsumer(Properties props, Schema schema, String topic) {
         Log.info("Starting consumer");
 
-        props.put("group.id", "kgroup");
+        props.put("group.id", "kgroup" + System.currentTimeMillis());
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
@@ -66,7 +66,8 @@ public class KLoadEntryPoint {
             TopicPartition topicPartition = new TopicPartition(topic, partition);
             OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
             Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
-            consumer.seek(topicPartition, offsetAndTimestamp.offset());
+            if (offsetAndTimestamp != null)
+                consumer.seek(topicPartition, offsetAndTimestamp.offset());
         }
         try {
             while (true) {
