@@ -39,7 +39,7 @@ public class EntryPoint {
             if (mode.equals("gate"))
                 RunHttpGate(props, schema, topic, metricsReporter);
             else if (mode.equals("consumer"))
-                RunConsumerGroup(props, schema, topic, metricsReporter);
+                RunConsumerGroup(props, schema, topic, metricsReporter, false);
             else
                 Log.error("KLoad mode is not recognized: " + mode);
         } else {
@@ -47,7 +47,7 @@ public class EntryPoint {
         }
     }
 
-    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) {
+    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter, boolean verboseLogging) {
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup");
@@ -88,14 +88,15 @@ public class EntryPoint {
                         lastTravelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
                         metricsReporter.consumed(lastTravelTime);
                     }
-                    Log.debug("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
-                            + " ts=" + formatTimestamp(lastRecord)
-                            + " key=" + lastRecord.key()
-                            + " v.ts=" + lastRecord.value().get("timestamp")
-                            + " v.size=" + lastRecord.serializedValueSize()
-                            + " tt=" + formatDuration(lastTravelTime)
-                            + " RC=" + records.count());
-
+                    if (verboseLogging) {
+                        Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
+                                + " ts=" + formatTimestamp(lastRecord)
+                                + " key=" + lastRecord.key()
+                                + " v.ts=" + lastRecord.value().get("timestamp")
+                                + " v.size=" + lastRecord.serializedValueSize()
+                                + " tt=" + formatDuration(lastTravelTime)
+                                + " RC=" + records.count());
+                    }
                 }
             } catch (WakeupException e) {
                 // ignore for shutdown via consumer.wakeup()
