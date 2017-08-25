@@ -25,50 +25,53 @@ namespace LoadApp
             stopwatch.Start();
             var tasks = new List<Task>();
 
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+            var tasks = new List<Task>();
             var printTask = new Task(() =>
             {
                 int counter = 0;
-                while (true)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     var prevSuccess = successCount;
                     Thread.Sleep(StepMilliseconds);
                     counter++;
                     var newSuccess = successCount;
-                    Console.WriteLine($"success = {successCount}, error={errorCount}, all = {requestCount},"
-                                      + $" perSecond={(double) (newSuccess - prevSuccess) / StepMilliseconds * 1000},"
-                                      + $" avg={(double) successCount / counter / StepMilliseconds * 1000:N1}"
-                                      + $" tasks_count={tasks.Count}");
+                    var rps = (double)(newSuccess - prevSuccess) / StepMilliseconds * 1000;
+                    var avgRps = (double)successCount / counter / StepMilliseconds * 1000;
+                    Console.WriteLine($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
                 }
             });
             printTask.Start();
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(120))
+
+            for (var i = 0; i < 10; i++)
             {
-                if (tasks.Count < 600)
+                for (var j = 0; j < 200; j++)
                 {
-                    tasks.AddRange(Enumerable.Range(0, 50).Select(i => LoadAsync(httpClient)).ToArray());
+                    var task = new Task(() =>
+                    {
+                        SendingLoop(httpClient, cancellationToken);
+                    }, cancellationToken);
+                    task.Start();
+                    tasks.Add(task);
                 }
-                Thread.Sleep(StepMilliseconds);
             }
+            Thread.Sleep(60000);
+            cancellationTokenSource.Cancel();
             Console.WriteLine($"success = {successCount}, all = {requestCount}");
         }
 
-        private static async Task LoadAsync(HttpClient httpClient)
+        private static void SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                try
-                {
-                    Interlocked.Increment(ref requestCount);
-                    var httpResponseMessage = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10")).ConfigureAwait(false);
-                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
-                        Interlocked.Increment(ref successCount);
-                    else
-                        Interlocked.Increment(ref errorCount);
-                }
-                catch (Exception e)
-                {
+                Interlocked.Increment(ref requestCount);
+                var httpResponseMessage = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10"))
+                    .Result;
+                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                    Interlocked.Increment(ref successCount);
+                else
                     Interlocked.Increment(ref errorCount);
-                }
             }
         }
     }

@@ -18,17 +18,6 @@ namespace ConsumerTest
                 .SetBootstrapServers(new Uri("http://localhost:9092"))
                 .SetAcks(1)
                 .SetRetries(0).SetLinger(TimeSpan.FromMilliseconds(20))
-                .SetCompression(CompressionCodes.none)
-                //.Set("linger.ms", 20)
-                //.Set("batch.size", 64 * 1000)
-                //.Set("buffer.memory", 256 * 1000 * 1000)
-                //.Set("max.request.size", 20 * 1000 * 1000)
-                //.Set("compression.type", "none")
-                //.Set("metadata.fetch.timeout.ms", 25)
-                //.Set("max.block.ms", 25)
-                //.Set("max.in.flight.requests.per.connection", 500)
-                //.Set("queue.buffering.max.ms", 200)
-
                 .Set("socket.blocking.max.ms", 25)
                 .Set("batch.num.messages", 64 * 1000)
                 .Set("message.max.bytes", 20 * 1000 * 1000)
@@ -82,15 +71,15 @@ namespace ConsumerTest
             {
                 for (var j = 0; j < 2000; j++)
                 {
-                    var task = new Task(async () =>
+                    var task = new Task(() =>
                     {
-                        await SendingLoop(httpClient, cancellationToken);
-                    });
+                        SendingLoop(httpClient, cancellationToken);
+                    }, cancellationToken);
                     task.Start();
                     tasks.Add(task);
                 }
             }
-            Thread.Sleep(60000);
+            Thread.Sleep(20000);
             cancellationTokenSource.Cancel();
 
             Program.Logger.Info($"success = {successCount}, all = {requestCount}");
@@ -100,7 +89,7 @@ namespace ConsumerTest
             .Select(i => new Random().Next(256))
             .Select(@int => (byte)@int)
             .ToArray();
-        private static async Task SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
+        private static void SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -109,7 +98,7 @@ namespace ConsumerTest
                 {
                     for (var i = 0; i < 100; i++)
                     {
-                        await kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body);
+                        kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body);
                         Interlocked.Increment(ref successCount);
                     }
                 }

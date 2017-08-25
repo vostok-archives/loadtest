@@ -4,7 +4,8 @@
     <ThreadPoolMinThreads>2000</ThreadPoolMinThreads>
     <ThreadPoolMaxThreads>3000</ThreadPoolMaxThreads>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
 </Project>

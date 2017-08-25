@@ -24,7 +24,7 @@ namespace ConsumerTest
                 .SetBootstrapServers(new Uri("http://localhost:9092"))
                 .SetAcks(1)
                 .SetRetries(0)
-                //.SetCompression(CompressionCodes.none)
+                .SetCompression(CompressionCodes.none)
                 //.Set("enable.auto.commit", true)
                 //.Set("max.poll.records", 64 * 1000)
                 .Set("max.partition.fetch.bytes", 1048576)
