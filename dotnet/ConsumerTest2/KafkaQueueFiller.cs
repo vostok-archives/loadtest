@@ -62,7 +62,7 @@ namespace ConsumerTest
                     var newSuccess = successCount;
                     var rps = (double)(newSuccess - prevSuccess) / stepMilliseconds * 1000;
                     var avgRps = (double)successCount / counter / stepMilliseconds * 1000;
-                    Program.Logger.Info($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
+                    Program.Log($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning);
             watcherTask.Start();
@@ -82,7 +82,7 @@ namespace ConsumerTest
             Thread.Sleep(20000);
             cancellationTokenSource.Cancel();
 
-            Program.Logger.Info($"success = {successCount}, all = {requestCount}");
+            Program.Log($"success = {successCount}, all = {requestCount}");
         }
 
         private static readonly byte[] body = Enumerable.Range(0, 10)

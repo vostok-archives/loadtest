@@ -23,7 +23,6 @@ namespace LoadApp
             httpClient.Timeout = TimeSpan.FromSeconds(11);
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var tasks = new List<Task>();
 
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;

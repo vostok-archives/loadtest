@@ -12,12 +12,18 @@ namespace ConsumerTest
     class Program
     {
         public static int MessageCount = 0;
-        public static ILog Logger;
+        //public static ILog Logger;
+
+        public static void Log(string msg)
+        {
+            Console.WriteLine($"{DateTime.Now.ToShortTimeString()} {msg}");
+            //Logger.Info(msg)
+        }
 
         static void Main(string[] args)
         {
-            Util.ConfigureLog4Net();
-            Logger = LogManager.GetLogger(typeof(Program));
+            //Util.ConfigureLog4Net();
+            //Logger = LogManager.GetLogger(typeof(Program));
             KafkaQueueFiller.Run();
 
             var kafkaSetting = new KafkaSetting()
@@ -52,7 +58,7 @@ namespace ConsumerTest
                     var rps = (double)(newCount - prevCount) / stepMilliseconds * 1000;
                     var avgRps = (double)newCount / counter / stepMilliseconds * 1000;
                     //Console.WriteLine(DiffTimestampManager.GetReport());
-                    Logger.Info($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
+                    Log($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
                     if (Math.Abs(rps) < 1 && newCount > 0)
                         break;
                 }
