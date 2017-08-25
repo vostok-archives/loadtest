@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +30,7 @@ namespace KafkaClient
             consumer.OnPartitionsAssigned += (s, e) =>
             {
                 Console.WriteLine($"Assigned partitions: [{string.Join(", ", e)}], member id: {consumer.MemberId}");
-                consumer.Assign(e);
+                consumer.Assign(e.Select(x => new TopicPartitionOffset(x, Offset.Stored)));
             };
             consumer.OnPartitionsRevoked += (_, e) =>
             {
