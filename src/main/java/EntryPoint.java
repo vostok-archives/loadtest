@@ -4,7 +4,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.record.TimestampType;
 import org.rapidoid.log.Log;
@@ -14,12 +13,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class KLoadEntryPoint {
+public class EntryPoint {
 
     public static void main(String[] args) throws Exception {
         ((ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("org.apache.kafka")).setLevel(Level.INFO);
@@ -36,13 +33,13 @@ public class KLoadEntryPoint {
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse(schemaString);
         String topic = "ktopic-with-ts";
-        KThroughputMeter throughputMeter = new KThroughputMeter(5);
+        MetricsReporter metricsReporter = new MetricsReporter(3);
         if (args != null && args.length > 0) {
             String mode = args[0];
             if (mode.equals("gate"))
-                RunHttpGate(props, schema, topic, throughputMeter);
+                RunHttpGate(props, schema, topic, metricsReporter);
             else if (mode.equals("consumer"))
-                RunConsumer(props, schema, topic, throughputMeter);
+                RunConsumerGroup(props, schema, topic, metricsReporter);
             else
                 Log.error("KLoad mode is not recognized: " + mode);
         } else {
@@ -50,7 +47,7 @@ public class KLoadEntryPoint {
         }
     }
 
-    private static void RunConsumer(Properties props, Schema schema, String topic, KThroughputMeter throughputMeter) {
+    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) {
         Log.info("Starting consumer");
 
         props.put("group.id", "kgroup");
@@ -85,18 +82,20 @@ public class KLoadEntryPoint {
                     ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
                     long currentTimestamp = System.currentTimeMillis();
                     ConsumerRecord<String, GenericRecord> lastRecord = null;
+                    long lastTravelTime = 0;
                     for (ConsumerRecord<String, GenericRecord> record : records) {
                         lastRecord = record;
+                        lastTravelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
+                        metricsReporter.consumed(lastTravelTime);
                     }
-                    long travelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
-                    Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
+                    Log.debug("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
                             + " ts=" + formatTimestamp(lastRecord)
                             + " key=" + lastRecord.key()
                             + " v.ts=" + lastRecord.value().get("timestamp")
                             + " v.size=" + lastRecord.serializedValueSize()
-                            + " tt=" + formatDuration(travelTime)
+                            + " tt=" + formatDuration(lastTravelTime)
                             + " RC=" + records.count());
-                    throughputMeter.increment(records.count());
+
                 }
             } catch (WakeupException e) {
                 // ignore for shutdown via consumer.wakeup()
@@ -133,7 +132,7 @@ public class KLoadEntryPoint {
         return String.format("%d:%02d:%03d", totalMinutes, seconds, millis);
     }
 
-    private static void RunHttpGate(Properties props, Schema schema, String topic, KThroughputMeter throughputMeter) throws IOException {
+    private static void RunHttpGate(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
         Log.info("Starting http gate");
 
         props.put("acks", "1");
@@ -150,38 +149,10 @@ public class KLoadEntryPoint {
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 
         Producer<String, GenericRecord> producer = new KafkaProducer<>(props);
-        Server server = new KHttpServer(schema, producer, topic, throughputMeter, 100).listen(8888);
+        LoadGenerator loadGenerator = new LoadGenerator(schema, producer, topic, 100);
+        Server server = new HttpServer(metricsReporter, loadGenerator).listen(8888);
         new BufferedReader(new InputStreamReader(System.in)).readLine();
         server.shutdown();
         producer.close();
-    }
-
-    public static class GoBackOnRebalance implements ConsumerRebalanceListener {
-        private final int seconds;
-        private Consumer<?, ?> consumer;
-
-        public GoBackOnRebalance(Consumer<?, ?> consumer, int seconds) {
-            this.consumer = consumer;
-            this.seconds = seconds;
-        }
-
-        public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-        }
-
-        public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-            long startTimestamp = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(seconds);
-            for (TopicPartition topicPartition : partitions) {
-                OffsetAndTimestamp offsetAndTimestamp = consumer.offsetsForTimes(Collections.singletonMap(topicPartition, startTimestamp)).get(topicPartition);
-                long offset;
-                if (offsetAndTimestamp != null) {
-                    offset = offsetAndTimestamp.offset();
-                    Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
-                } else {
-                    offset = consumer.endOffsets(Arrays.asList(topicPartition)).get(topicPartition);
-                    Log.info("Rewind consumer for " + topicPartition + " to the end");
-                }
-                consumer.seek(topicPartition, offset);
-            }
-        }
     }
 }

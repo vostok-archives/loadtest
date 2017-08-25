@@ -79,7 +79,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>KLoadEntryPoint</mainClass>
+                            <mainClass>EntryPoint</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
