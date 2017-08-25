@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.3" />
     <PackageReference Include="Microsoft.Hadoop.Avro" Version="1.5.6" />
   </ItemGroup>
 
