@@ -14,18 +14,7 @@ namespace ConsumerTest
 
         static KafkaProducerProvider()
         {
-            var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://localhost:9092"))
-                .SetAcks(1)
-                .SetRetries(0).SetLinger(TimeSpan.FromMilliseconds(20))
-                .Set("socket.blocking.max.ms", 25)
-                .Set("batch.num.messages", 64 * 1000)
-                .Set("message.max.bytes", 20 * 1000 * 1000)
-                .Set("queue.buffering.max.messages", 10000000)
-                .Set("queue.buffering.max.kbytes", 2097151)
-                .SetClientId("client-id")
-                .SetGroupId("test-group");
-            kafkaProducer = new KafkaProducer(kafkaSetting);
+            kafkaProducer = new KafkaProducer(Program.KafkaSetting);
         }
 
         public static KafkaProducer Get()
@@ -37,10 +26,9 @@ namespace ConsumerTest
     class KafkaQueueFiller
     {
         private const int stepMilliseconds = 500;
-        private static int requestCount = 0;
-        private static int successCount = 0;
-        private static int errorCount = 0;
-        static int lastSuccessPerSecond = 0;
+        private static int requestCount;
+        private static int successCount;
+        private static int errorCount;
         private static KafkaProducer kafkaProducer;
 
         public static void Run()
@@ -96,17 +84,24 @@ namespace ConsumerTest
                 Interlocked.Increment(ref requestCount);
                 try
                 {
-                    for (var i = 0; i < 100; i++)
-                    {
-                        kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body);
-                        Interlocked.Increment(ref successCount);
-                    }
+                    Produce(cancellationToken);
                 }
                 catch (Exception)
                 {
                     Interlocked.Increment(ref errorCount);
                 }
             }
+        }
+
+        private static void Produce(CancellationToken cancellationToken)
+        {
+            var tasks = new List<Task>();
+            for (var i = 0; i < 100; i++)
+            {
+                tasks.Add(kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body));
+                Interlocked.Increment(ref successCount);
+            }
+            Task.WaitAll(tasks.ToArray(), cancellationToken);
         }
     }
 }

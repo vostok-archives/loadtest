@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using Confluent.Kafka.Serialization;
@@ -12,56 +13,59 @@ namespace ConsumerTest
     class Program
     {
         public static int MessageCount = 0;
-        //public static ILog Logger;
+        public static ILog Logger;
+
+        public static readonly KafkaSetting KafkaSetting = new KafkaSetting()
+            .SetBootstrapServers(new Uri("http://localhost:9092"))
+            .SetAcks(1)
+            .SetRetries(0)
+            .Set("auto.offset.reset", "latest")
+            .Set("auto.commit.interval.ms", 1000)
+            .Set("session.timeout.ms", 60000)
+            .Set("fetch.message.max.bytes", 5242880)
+            .Set("fetch.wait.max.ms", 500)
+            .Set("socket.blocking.max.ms", 25)
+            .Set("batch.num.messages", 64 * 1000)
+            .Set("message.max.bytes", 20 * 1000 * 1000)
+            .Set("queue.buffering.max.messages", 10000000)
+            .Set("queue.buffering.max.kbytes", 2097151)
+            .SetClientId("client-id")
+            .SetGroupId("test-group");
 
         public static void Log(string msg)
         {
-            Console.WriteLine($"{DateTime.Now.ToShortTimeString()} {msg}");
-            //Logger.Info(msg)
+            //Console.WriteLine($"{DateTime.Now.ToShortTimeString()} {msg}");
+            Logger.Info(msg);
         }
 
         static void Main(string[] args)
         {
-            //Util.ConfigureLog4Net();
-            //Logger = LogManager.GetLogger(typeof(Program));
+            Util.ConfigureLog4Net();
+            Logger = LogManager.GetLogger(typeof(Program));
             KafkaQueueFiller.Run();
 
-            var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://localhost:9092"))
-                .SetAcks(1)
-                .SetRetries(0)
-                .SetCompression(CompressionCodes.none)
-                //.Set("enable.auto.commit", true)
-                //.Set("max.poll.records", 64 * 1000)
-                .Set("max.partition.fetch.bytes", 1048576)
-                .Set("fetch.min.bytes", 1)
-                //.Set("fetch.max.bytes", 52428800)
-                //.Set("fetch.max.wait.ms", 500)
-                .Set("socket.blocking.max.ms", 25)
-                .Set("batch.num.messages", 64 * 1000)
-                .Set("message.max.bytes", 20 * 1000 * 1000)
-                .Set("queue.buffering.max.messages", 10000000)
-                .Set("queue.buffering.max.kbytes", 2097151)
-                .SetClientId("client-id")
-                .SetGroupId("test-group");
-
-            using (new KafkaConsumer<byte[]>(kafkaSetting, "topic", new SimpleDesiralizer(), new MessageObserver()))
+            var consumers = Enumerable.Range(1, 3)
+                .Select(x => new KafkaConsumer<byte[]>(Program.KafkaSetting, "topic", new SimpleDesiralizer(),
+                    new MessageObserver()))
+                .ToArray();
+            var counter = 0;
+            const int stepMilliseconds = 1000;
+            while (true)
             {
-                var counter = 0;
-                const int stepMilliseconds = 1000;
-                while (true)
-                {
-                    var prevCount = MessageCount;
-                    Thread.Sleep(TimeSpan.FromMilliseconds(stepMilliseconds));
-                    counter++;
-                    var newCount = MessageCount;
-                    var rps = (double)(newCount - prevCount) / stepMilliseconds * 1000;
-                    var avgRps = (double)newCount / counter / stepMilliseconds * 1000;
-                    //Console.WriteLine(DiffTimestampManager.GetReport());
-                    Log($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
-                    if (Math.Abs(rps) < 1 && newCount > 0)
-                        break;
-                }
+                var prevCount = MessageCount;
+                Thread.Sleep(TimeSpan.FromMilliseconds(stepMilliseconds));
+                counter++;
+                var newCount = MessageCount;
+                var rps = (double)(newCount - prevCount) / stepMilliseconds * 1000;
+                var avgRps = (double)newCount / counter / stepMilliseconds * 1000;
+                //Console.WriteLine(DiffTimestampManager.GetReport());
+                Log($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
+                if (Math.Abs(rps) < 1 && newCount > 0)
+                    break;
+            }
+            foreach (var consumer in consumers)
+            {
+                consumer.Dispose();
             }
         }
     }
