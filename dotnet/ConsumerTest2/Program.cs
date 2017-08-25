@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
+using log4net;
 using Microsoft.Hadoop.Avro;
 
 namespace ConsumerTest
@@ -11,15 +12,25 @@ namespace ConsumerTest
     class Program
     {
         public static int MessageCount = 0;
+        public static ILog Logger;
+
         static void Main(string[] args)
         {
-            //KafkaQueueFiller.Run();
+            Util.ConfigureLog4Net();
+            Logger = LogManager.GetLogger(typeof(Program));
+            KafkaQueueFiller.Run();
 
             var kafkaSetting = new KafkaSetting()
                 .SetBootstrapServers(new Uri("http://localhost:9092"))
                 .SetAcks(1)
                 .SetRetries(0)
+                //.SetCompression(CompressionCodes.none)
                 //.Set("enable.auto.commit", true)
+                //.Set("max.poll.records", 64 * 1000)
+                .Set("max.partition.fetch.bytes", 1048576)
+                .Set("fetch.min.bytes", 1)
+                //.Set("fetch.max.bytes", 52428800)
+                //.Set("fetch.max.wait.ms", 500)
                 .Set("socket.blocking.max.ms", 25)
                 .Set("batch.num.messages", 64 * 1000)
                 .Set("message.max.bytes", 20 * 1000 * 1000)
@@ -28,12 +39,11 @@ namespace ConsumerTest
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
 
-            using (var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "topic", new SimpleDesiralizer(), new MessageObserver()))
+            using (new KafkaConsumer<byte[]>(kafkaSetting, "topic", new SimpleDesiralizer(), new MessageObserver()))
             {
-                var cancellationToken = new CancellationToken();
                 var counter = 0;
                 const int stepMilliseconds = 1000;
-                while (!cancellationToken.IsCancellationRequested)
+                while (true)
                 {
                     var prevCount = MessageCount;
                     Thread.Sleep(TimeSpan.FromMilliseconds(stepMilliseconds));
@@ -42,10 +52,10 @@ namespace ConsumerTest
                     var rps = (double)(newCount - prevCount) / stepMilliseconds * 1000;
                     var avgRps = (double)newCount / counter / stepMilliseconds * 1000;
                     //Console.WriteLine(DiffTimestampManager.GetReport());
-                    Console.WriteLine($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
+                    Logger.Info($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
+                    if (Math.Abs(rps) < 1 && newCount > 0)
+                        break;
                 }
-
-                kafkaConsumer.Dispose();
             }
         }
     }

@@ -35,12 +35,12 @@ namespace KafkaClient
         {
             var message = await task.ConfigureAwait(false);
 
-            Console.WriteLine($"Produced partition:{message.Partition}, offset:{message.Offset}, topic:{message.Topic}");
+            //Console.WriteLine($"Produced partition:{message.Partition}, offset:{message.Offset}, topic:{message.Topic}");
             if (message.Error.HasError)
             {
                 throw new Exception(message.Error.Reason);
             }
-            producer.Flush(10000);
+            //producer.Flush(10000);
         }
 
         public void Dispose()

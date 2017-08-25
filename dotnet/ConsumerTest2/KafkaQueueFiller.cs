@@ -17,7 +17,8 @@ namespace ConsumerTest
             var kafkaSetting = new KafkaSetting()
                 .SetBootstrapServers(new Uri("http://localhost:9092"))
                 .SetAcks(1)
-                .SetRetries(0)
+                .SetRetries(0).SetLinger(TimeSpan.FromMilliseconds(20))
+                .SetCompression(CompressionCodes.none)
                 //.Set("linger.ms", 20)
                 //.Set("batch.size", 64 * 1000)
                 //.Set("buffer.memory", 256 * 1000 * 1000)
@@ -72,59 +73,50 @@ namespace ConsumerTest
                     var newSuccess = successCount;
                     var rps = (double)(newSuccess - prevSuccess) / stepMilliseconds * 1000;
                     var avgRps = (double)successCount / counter / stepMilliseconds * 1000;
-                    Console.WriteLine($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
+                    Program.Logger.Info($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning);
             watcherTask.Start();
 
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 1; i++)
             {
-                for (var j = 0; j < 1; j++)
+                for (var j = 0; j < 2000; j++)
                 {
-                    var task = new Task(() =>
+                    var task = new Task(async () =>
                     {
-                        SendingLoop(httpClient, cancellationToken);
+                        await SendingLoop(httpClient, cancellationToken);
                     });
                     task.Start();
                     tasks.Add(task);
                 }
-                Thread.Sleep(500);
             }
+            Thread.Sleep(60000);
             cancellationTokenSource.Cancel();
 
-            Console.WriteLine($"success = {successCount}, all = {requestCount}");
+            Program.Logger.Info($"success = {successCount}, all = {requestCount}");
         }
 
         private static readonly byte[] body = Enumerable.Range(0, 10)
             .Select(i => new Random().Next(256))
             .Select(@int => (byte)@int)
             .ToArray();
-        private static void SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
+        private static async Task SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 Interlocked.Increment(ref requestCount);
                 try
                 {
-                    var tasks = Enumerable.Range(1, 1).Select(x =>
+                    for (var i = 0; i < 100; i++)
                     {
-                        var task = kafkaProducer.ProduceAsync("hellokafka", Guid.NewGuid(), body);
-                        return task;
-                    }).ToArray();
-                    Task.WaitAll(tasks);
-                    //task.Wait();
-                    Interlocked.Increment(ref successCount);
+                        await kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body);
+                        Interlocked.Increment(ref successCount);
+                    }
                 }
                 catch (Exception)
                 {
                     Interlocked.Increment(ref errorCount);
                 }
-                //var httpResponseMessage = await httpClient
-                //    .SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10")).ConfigureAwait(false);
-                //if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
-                //    Interlocked.Increment(ref successCount);
-                //else
-                //    Interlocked.Increment(ref errorCount);
             }
         }
     }
