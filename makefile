@@ -21,7 +21,7 @@ kill-java:
 build-java: pull
 	mvn clean package
 
-run-dotnet-gate: publishdotnet
+run-dotnet-gate: publish-dotnet-gate
 	dotnet/KafkaLoadService.Core/bin/Debug/netcoreapp2.0/rhel-x64/publish/KafkaLoadService.Core
 
 publish-dotnet-gate: pull
@@ -29,7 +29,7 @@ publish-dotnet-gate: pull
 	cp /usr/local/lib/librdkafka*.so dotnet/KafkaLoadService.Core/bin/Debug/netcoreapp2.0/rhel-x64/publish/
 	
 
-run-dotnet-consumer: publishdotnet
+run-dotnet-consumer: publish-dotnet-consumer
 	dotnet/ConsumerTest/bin/Debug/netcoreapp2.0/rhel-x64/publish/ConsumerTest
 
 publish-dotnet-consumer: pull
