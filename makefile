@@ -36,6 +36,13 @@ publish-dotnet-consumer: pull
 	cd dotnet/ConsumerTest && dotnet publish -r rhel-x64
 	cp /usr/local/lib/librdkafka*.so dotnet/ConsumerTest/bin/Debug/netcoreapp2.0/rhel-x64/publish/
 	
+run-dotnet-consumer2: publish-dotnet-consumer2
+	dotnet/ConsumerTest2/bin/netcoreapp2.0/rhel-x64/publish/ConsumerTest2
+
+publish-dotnet-consumer2: pull
+	cd dotnet/ConsumerTest2 && dotnet publish -r rhel-x64
+	cp /usr/local/lib/librdkafka*.so dotnet/ConsumerTest2/bin/netcoreapp2.0/rhel-x64/publish/
+	
 	
 
 fire: pull
