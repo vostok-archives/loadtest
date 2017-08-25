@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using Confluent.Kafka.Serialization;
@@ -11,20 +10,22 @@ namespace ConsumerTest
 {
     class Program
     {
+        private const int StepMilliseconds = 500;
         static void Main(string[] args)
         {
             var kafkaSetting = new KafkaSetting()
                 .SetBootstrapServers(new Uri("http://icat-test01:9092"))
                 .SetGroupId("test-group2");
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new MessageObserver());
-
+            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "topic-kload-dot-net", new DefaultDeserializer(), new CounterObserver());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
-                Console.WriteLine(TimestampInfoManager.GetReport());
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
+                var oldvalue = Counter.Value;
+                Thread.Sleep(TimeSpan.FromMilliseconds(StepMilliseconds));
+                var newValue = Counter.Value;
+                Console.WriteLine($"{((double)newValue - oldvalue)/StepMilliseconds*1000}\t{newValue}");
             }
 
             kafkaConsumer.Dispose();
@@ -59,9 +60,10 @@ namespace ConsumerTest
                 using (var memoryStream = new MemoryStream(data))
                 {
                     var result = (AvroRecord) avroSerializer.Deserialize(memoryStream);
-                    Console.WriteLine(result.GetField<long>("timestamp"));
                     return new TestKafkaModel
                     {
+                        Timestamp = result.GetField<long>("timestamp"),
+                        Payload = result.GetField<byte[]>("payload")
                     };
                 }
             }
@@ -73,7 +75,42 @@ namespace ConsumerTest
         }
     }
 
-    public class MessageObserver : IObserver<TestKafkaModel>
+    public class DefaultDeserializer : IDeserializer<byte[]>
+    {
+        public byte[] Deserialize(byte[] data)
+        {
+            return data;
+        }
+    }
+
+    public class CounterObserver : IObserver<byte[]>
+    {
+        public void OnCompleted()
+        { }
+
+        public void OnError(Exception error)
+        {
+            Console.WriteLine(error);
+        }
+
+        public void OnNext(byte[] value)
+        {
+            Counter.Inc();
+        }
+    }
+
+    public static class Counter
+    {
+        private static int value = 0;
+        public static int Value => value;
+
+        public static void Inc()
+        {
+            Interlocked.Increment(ref value);
+        }
+    }
+
+    public class TestKafkaModelObserver : IObserver<TestKafkaModel>
     {
         public void OnCompleted()
         { }
