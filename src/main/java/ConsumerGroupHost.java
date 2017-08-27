@@ -26,6 +26,7 @@ public class ConsumerGroupHost {
     }
 
     public void run() {
+        Log.info("Start consuming in " + numConsumers + " threads");
         final List<ConsumerLoop> consumers = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(numConsumers);
         for (int consumerId = 0; consumerId < numConsumers; consumerId++) {

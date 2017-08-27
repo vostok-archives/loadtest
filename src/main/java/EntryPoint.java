@@ -39,29 +39,6 @@ public class EntryPoint {
         }
     }
 
-    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
-        Log.info("Starting consumer group");
-
-        props.put("group.id", "kgroup");
-        props.put("auto.offset.reset", "latest");
-        props.put("enable.auto.commit", "true");
-        props.put("auto.commit.interval.ms", 1000);
-        props.put("session.timeout.ms", 60000);
-        props.put("max.poll.records", 64 * 1000);
-        props.put("max.partition.fetch.bytes", 1048576);
-        props.put("fetch.min.bytes", 1);
-        props.put("fetch.max.bytes", 52428800);
-        props.put("fetch.max.wait.ms", 500);
-        props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
-        props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
-
-        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false, 1);
-        consumerGroupHost.run();
-        Server server = new HttpServer(metricsReporter, null).listen(8889);
-        new BufferedReader(new InputStreamReader(System.in)).readLine();
-        server.shutdown();
-    }
-
     private static void RunHttpGate(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
         Log.info("Starting http gate");
 
@@ -79,9 +56,32 @@ public class EntryPoint {
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 
         LoadGenerator loadGenerator = new LoadGenerator(schema, props, topic, 100);
-        Server server = new HttpServer(metricsReporter, loadGenerator).listen(8888);
+        Server httpServer = new HttpServer(metricsReporter, loadGenerator).listen(8888);
         new BufferedReader(new InputStreamReader(System.in)).readLine();
-        server.shutdown();
+        httpServer.shutdown();
         loadGenerator.shutdown();
+    }
+
+    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
+        Log.info("Starting consumer group");
+
+        props.put("group.id", "kgroup");
+        props.put("auto.offset.reset", "latest");
+        props.put("enable.auto.commit", "true");
+        props.put("auto.commit.interval.ms", 1000);
+        props.put("session.timeout.ms", 60000);
+        props.put("max.poll.records", 64 * 1000);
+        props.put("max.partition.fetch.bytes", 1048576);
+        props.put("fetch.min.bytes", 1);
+        props.put("fetch.max.bytes", 52428800);
+        props.put("fetch.max.wait.ms", 500);
+        props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+        props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+
+        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false, 3);
+        consumerGroupHost.run();
+        Server httpServer = new HttpServer(metricsReporter, null).listen(8889);
+        new BufferedReader(new InputStreamReader(System.in)).readLine();
+        httpServer.shutdown();
     }
 }
