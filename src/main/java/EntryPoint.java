@@ -39,7 +39,7 @@ public class EntryPoint {
         }
     }
 
-    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) {
+    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
         Log.info("Starting consumer group");
 
         props.put("group.id", "kgroup");
@@ -55,8 +55,11 @@ public class EntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
 
-        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false);
+        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false, 1);
         consumerGroupHost.run();
+        Server server = new HttpServer(metricsReporter, null).listen(8889);
+        new BufferedReader(new InputStreamReader(System.in)).readLine();
+        server.shutdown();
     }
 
     private static void RunHttpGate(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
@@ -79,6 +82,6 @@ public class EntryPoint {
         Server server = new HttpServer(metricsReporter, loadGenerator).listen(8888);
         new BufferedReader(new InputStreamReader(System.in)).readLine();
         server.shutdown();
-        loadGenerator.close();
+        loadGenerator.shutdown();
     }
 }

@@ -46,7 +46,7 @@ public class LoadGenerator {
         return ByteBuffer.wrap(randomBytesSource, offset, eventSize).slice();
     }
 
-    public void close() {
+    public void shutdown() {
         producer.close();
     }
 }

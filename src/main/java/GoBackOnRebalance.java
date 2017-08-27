@@ -10,11 +10,13 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class GoBackOnRebalance implements ConsumerRebalanceListener {
+    private final int consumerId;
     private final int seconds;
     private Consumer<?, ?> consumer;
 
-    public GoBackOnRebalance(Consumer<?, ?> consumer, int seconds) {
+    public GoBackOnRebalance(Consumer<?, ?> consumer, int consumerId, int seconds) {
         this.consumer = consumer;
+        this.consumerId = consumerId;
         this.seconds = seconds;
     }
 
@@ -28,10 +30,10 @@ public class GoBackOnRebalance implements ConsumerRebalanceListener {
             long offset;
             if (offsetAndTimestamp != null) {
                 offset = offsetAndTimestamp.offset();
-                Log.info("Rewind consumer for " + topicPartition + " to " + offsetAndTimestamp);
+                Log.info("Rewind consumer " + consumerId + " for " + topicPartition + " to " + offsetAndTimestamp);
             } else {
                 offset = consumer.endOffsets(Arrays.asList(topicPartition)).get(topicPartition);
-                Log.info("Rewind consumer for " + topicPartition + " to the end");
+                Log.info("Rewind consumer " + consumerId + " for " + topicPartition + " to the end");
             }
             consumer.seek(topicPartition, offset);
         }
