@@ -21,7 +21,10 @@ namespace KafkaClient
                 messageAction(message.Value);
             }
 
-            public bool MarshalData { get; }
+            public bool MarshalData
+            {
+                get { return true; }
+            }
         }
 
         private readonly Producer producer;

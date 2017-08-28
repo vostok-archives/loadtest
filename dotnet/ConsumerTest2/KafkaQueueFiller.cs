@@ -53,7 +53,7 @@ namespace ConsumerTest2
             requestCount = 0;
             successCount = 0;
             errorCount = 0;
-            kafkaProducer = KafkaProducerProvider.Get(OnMessageDelivered);
+            kafkaProducer = KafkaProducerProvider.Get(OnMessageDelivered); //
             var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:8888") };
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -77,7 +77,7 @@ namespace ConsumerTest2
 
             for (var i = 0; i < 1; i++)
             {
-                for (var j = 0; j < 2000; j++)
+                for (var j = 0; j < 1; j++)
                 {
                     var task = new Task(() =>
                     {
@@ -87,7 +87,7 @@ namespace ConsumerTest2
                     tasks.Add(task);
                 }
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(20000);
             cancellationTokenSource.Cancel();
 
             Program.Log($"success = {successCount}, all = {requestCount}");
@@ -115,9 +115,9 @@ namespace ConsumerTest2
 
         private static void Produce(CancellationToken cancellationToken)
         {
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 10000; i++)
             {
-                kafkaProducer.Produce(Topic, Guid.Empty, body);
+                kafkaProducer.Produce(Topic, Guid.NewGuid(), body);
             }
         }
     }
