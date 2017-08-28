@@ -56,7 +56,7 @@ namespace KafkaLoadService.Core
             {
                 foreach (var body in bodies)
                 {
-                    await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body).ConfigureAwait(false);
+                    kafkaProducer.Produce(TopicName, Guid.Empty, body);
                 }
             }
         }

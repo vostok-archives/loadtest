@@ -6,13 +6,11 @@ namespace KafkaLoadService.Core
 {
     public static class KafkaProducerProvider
     {
-        private static KafkaProducer[] kafkaProducers;
+        private static KafkaProducer kafkaProducer;
 
         static KafkaProducerProvider()
         {
-            kafkaProducers = Enumerable.Range(0, 10)
-                .Select(x => CreateKafkaProducer())
-                .ToArray();
+            kafkaProducer = CreateKafkaProducer();
         }
 
         private static KafkaProducer CreateKafkaProducer()
@@ -41,8 +39,7 @@ namespace KafkaLoadService.Core
 
         public static KafkaProducer Get()
         {
-            var random = new Random();
-            return kafkaProducers[random.Next(10)];
+            return kafkaProducer;
         }
     }
 }

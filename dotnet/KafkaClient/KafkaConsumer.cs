@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace KafkaClient
             consumer.OnPartitionsAssigned += (s, e) =>
             {
                 Console.WriteLine($"Assigned partitions: [{string.Join(", ", e)}], member id: {consumer.MemberId}");
-                consumer.Assign(e.Select(x => new TopicPartitionOffset(x, Offset.Stored)));
+                consumer.Assign(e.Select(x => new TopicPartitionOffset(x, Offset.Beginning)));
             };
             consumer.OnPartitionsRevoked += (_, e) =>
             {
@@ -38,7 +39,7 @@ namespace KafkaClient
                 consumer.Unassign();
             };
 
-            //consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(topic, 0, 0) });
+            //consumer.Assign(new [] { new TopicPartitionOffset(topic, 0, 0) });
             cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
             consumer.Subscribe(topic);

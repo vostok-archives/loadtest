@@ -4,36 +4,56 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ConsumerTest;
 using KafkaClient;
 
-namespace ConsumerTest
+namespace ConsumerTest2
 {
     public static class KafkaProducerProvider
     {
-        private static readonly KafkaProducer kafkaProducer;
+        private static readonly KafkaSetting kafkaSetting;
 
         static KafkaProducerProvider()
         {
-            kafkaProducer = new KafkaProducer(Program.KafkaSetting);
+            kafkaSetting = new KafkaSetting()
+                .SetBootstrapServers(new Uri(Program.KafkaUri))
+                .SetAcks(1)
+                .SetRetries(0).SetLinger(TimeSpan.FromMilliseconds(20))
+                .Set("socket.blocking.max.ms", 25)
+                .Set("batch.num.messages", 64 * 1000)
+                .Set("message.max.bytes", 20 * 1000 * 1000)
+                .Set("queue.buffering.max.messages", 10000000)
+                .Set("queue.buffering.max.kbytes", 2097151)
+                .SetClientId("client-id")
+                .SetGroupId("test-group");
         }
 
-        public static KafkaProducer Get()
+        public static KafkaProducer Get(Action<byte[]> receiveMessageAction = null)
         {
-            return kafkaProducer;
+            return new KafkaProducer(kafkaSetting, receiveMessageAction);
         }
     }
 
     class KafkaQueueFiller
     {
         private const int stepMilliseconds = 500;
+        public const string Topic = "topic2";
         private static int requestCount;
         private static int successCount;
         private static int errorCount;
         private static KafkaProducer kafkaProducer;
 
+        private static void OnMessageDelivered(byte [] data)
+        {
+            Interlocked.Increment(ref successCount);
+        }
+
         public static void Run()
         {
-            kafkaProducer = KafkaProducerProvider.Get();
+            requestCount = 0;
+            successCount = 0;
+            errorCount = 0;
+            kafkaProducer = KafkaProducerProvider.Get(OnMessageDelivered); //
             var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:8888") };
 
             var cancellationTokenSource = new CancellationTokenSource();
@@ -57,7 +77,7 @@ namespace ConsumerTest
 
             for (var i = 0; i < 1; i++)
             {
-                for (var j = 0; j < 2000; j++)
+                for (var j = 0; j < 1; j++)
                 {
                     var task = new Task(() =>
                     {
@@ -95,13 +115,10 @@ namespace ConsumerTest
 
         private static void Produce(CancellationToken cancellationToken)
         {
-            var tasks = new List<Task>();
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 10000; i++)
             {
-                tasks.Add(kafkaProducer.ProduceAsync("topic", Guid.NewGuid(), body));
-                Interlocked.Increment(ref successCount);
+                kafkaProducer.Produce(Topic, Guid.NewGuid(), body);
             }
-            Task.WaitAll(tasks.ToArray(), cancellationToken);
         }
     }
 }
