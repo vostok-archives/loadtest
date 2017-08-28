@@ -30,9 +30,15 @@ public class EntryPoint {
             String mode = args[0];
             if (mode.equals("gate"))
                 RunHttpGate(props, schema, topic, metricsReporter);
-            else if (mode.equals("consumer"))
-                RunConsumerGroup(props, schema, topic, metricsReporter);
-            else
+            else if (mode.equals("consumer")) {
+                int numConsumers = 3;
+                if (args.length > 1)
+                    numConsumers = Integer.parseInt(args[1]);
+                int goBackOnRebalanceSeconds = 30;
+                if (args.length > 2)
+                    goBackOnRebalanceSeconds = Integer.parseInt(args[2]);
+                RunConsumerGroup(props, schema, topic, metricsReporter, numConsumers, goBackOnRebalanceSeconds);
+            } else
                 Log.error("KLoad mode is not recognized: " + mode);
         } else {
             Log.error("KLoad mode is not specified");
@@ -62,7 +68,7 @@ public class EntryPoint {
         loadGenerator.shutdown();
     }
 
-    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter) throws IOException {
+    private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter, int numConsumers, int goBackOnRebalanceSeconds) throws IOException {
         Log.info("Starting consumer group");
 
         props.put("group.id", "kgroup");
@@ -78,7 +84,7 @@ public class EntryPoint {
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
 
-        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false, 3);
+        ConsumerGroupHost consumerGroupHost = new ConsumerGroupHost(schema, props, topic, metricsReporter, false, numConsumers, goBackOnRebalanceSeconds);
         consumerGroupHost.run();
         Server httpServer = new HttpServer(metricsReporter, null).listen(8889);
         new BufferedReader(new InputStreamReader(System.in)).readLine();

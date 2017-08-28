@@ -18,15 +18,17 @@ public class ConsumerLoop implements Runnable {
     private final MetricsReporter metricsReporter;
     private final boolean verboseLogging;
     private final int consumerId;
+    private final int goBackOnRebalanceSeconds;
     private final KafkaConsumer<String, GenericRecord> consumer;
 
-    public ConsumerLoop(Schema schema, Properties props, String topic, MetricsReporter metricsReporter, boolean verboseLogging, int consumerId) {
+    public ConsumerLoop(Schema schema, Properties props, String topic, MetricsReporter metricsReporter, boolean verboseLogging, int consumerId, int goBackOnRebalanceSeconds) {
         this.schema = schema;
         this.props = props;
         this.topic = topic;
         this.metricsReporter = metricsReporter;
         this.verboseLogging = verboseLogging;
         this.consumerId = consumerId;
+        this.goBackOnRebalanceSeconds = goBackOnRebalanceSeconds;
         consumer = new KafkaConsumer<>(props);
     }
 
@@ -58,7 +60,7 @@ public class ConsumerLoop implements Runnable {
     @Override
     public void run() {
         try {
-            consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, consumerId, 30));
+            consumer.subscribe(Arrays.asList(topic), new GoBackOnRebalance(consumer, consumerId, goBackOnRebalanceSeconds));
             while (true) {
                 ConsumerRecords<String, GenericRecord> records = consumer.poll(Long.MAX_VALUE);
                 long currentTimestamp = System.currentTimeMillis();
