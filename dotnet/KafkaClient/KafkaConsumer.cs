@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace KafkaClient
                 consumer.Unassign();
             };
 
-            //consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(topic, 0, 0) });
+            //consumer.Assign(new [] { new TopicPartitionOffset(topic, 0, 0) });
             cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
             consumer.Subscribe(topic);
