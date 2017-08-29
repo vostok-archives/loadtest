@@ -8,6 +8,7 @@ import org.rapidoid.net.impl.RapidoidHelper;
 public class HttpServer extends AbstractHttpServer {
 
     private static final byte[] URI_TH = "/th".getBytes();
+    private static final byte[] URI_THMB = "/thmb".getBytes();
     private static final byte[] URI_MTT = "/mtt".getBytes();
     private static final byte[] URI_NOOP = "/noop".getBytes();
     private static final byte[] URI_GEN = "/gen".getBytes();
@@ -38,6 +39,8 @@ public class HttpServer extends AbstractHttpServer {
                 return GenerateKafkaLoad(ctx, 1000, isKeepAlive, false);
             } else if (matches(buf, req.path, URI_TH)) {
                 return ok(ctx, isKeepAlive, metricsReporter.getLastThroughput().getBytes(), MediaType.TEXT_PLAIN);
+            } else if (matches(buf, req.path, URI_THMB)) {
+                return ok(ctx, isKeepAlive, metricsReporter.getLastThroughputMb().getBytes(), MediaType.TEXT_PLAIN);
             } else if (matches(buf, req.path, URI_MTT)) {
                 return ok(ctx, isKeepAlive, metricsReporter.getLastMeanTravelTime().getBytes(), MediaType.TEXT_PLAIN);
             }
@@ -48,7 +51,7 @@ public class HttpServer extends AbstractHttpServer {
     private HttpStatus GenerateKafkaLoad(Channel ctx, int eventSize, boolean isKeepAlive, boolean publishToKafka) {
         if (loadGenerator != null) {
             int eventsCount = loadGenerator.produceEvents(eventSize, publishToKafka);
-            metricsReporter.produced(eventsCount);
+            metricsReporter.produced(eventsCount, eventSize);
         }
         return ok(ctx, isKeepAlive, new byte[0], MediaType.APPLICATION_OCTET_STREAM);
     }

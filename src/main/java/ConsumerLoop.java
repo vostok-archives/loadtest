@@ -69,7 +69,8 @@ public class ConsumerLoop implements Runnable {
                 for (ConsumerRecord<String, GenericRecord> record : records) {
                     lastRecord = record;
                     lastTravelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
-                    metricsReporter.consumed(lastTravelTime);
+                    int  payloadSize = ((byte[])lastRecord.value().get("payload")).length;
+                    metricsReporter.consumed(lastTravelTime, payloadSize);
                 }
                 if (verboseLogging) {
                     Log.info("[" + lastRecord.partition() + ":" + lastRecord.offset() + "]:"
