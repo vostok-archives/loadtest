@@ -79,7 +79,7 @@ public class EntryPoint {
         props.put("max.poll.records", 128 * 1000);
         props.put("max.partition.fetch.bytes", 10485760);
         props.put("fetch.min.bytes", 1);
-        props.put("fetch.max.bytes", 52428800);
+        props.put("fetch.max.bytes", 524288000);
         props.put("fetch.max.wait.ms", 500);
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
