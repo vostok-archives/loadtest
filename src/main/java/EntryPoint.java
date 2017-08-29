@@ -70,7 +70,7 @@ public class EntryPoint {
 
     private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter, int numConsumers, int goBackOnRebalanceSeconds) throws IOException {
         String hostName = java.net.InetAddress.getLocalHost().getHostName();
-        Log.info("Starting consumer group " + hostname);
+        Log.info("Starting consumer group " + hostName);
 
         props.put("group.id", "kgroup-" + hostName);
         props.put("auto.offset.reset", "latest");
