@@ -69,9 +69,10 @@ public class EntryPoint {
     }
 
     private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter, int numConsumers, int goBackOnRebalanceSeconds) throws IOException {
-        Log.info("Starting consumer group");
+        String hostName = java.net.InetAddress.getLocalHost().getHostName();
+        Log.info("Starting consumer group " + hostname);
 
-        props.put("group.id", "kgroup");
+        props.put("group.id", "kgroup-" + hostName);
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
