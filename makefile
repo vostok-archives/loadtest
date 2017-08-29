@@ -69,12 +69,12 @@ fire: pull
 		echo "    <Netstat />"                                                                    >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
-	for host in edi18 icat-test01 icat-test02 icat-test03 ; do \
+	for host in edi18 icat-test04 icat-test05 ; do \
 		echo "  <Host address=\"$$host\" interval=\"3\" comment=\"$$host\">"                                     >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer Throughput\">curl -s -H 'Host: edi18' 'http://$$host:8888/th'</Custom>" >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer MTT\">curl -s -H 'Host: edi18' 'http://$$host:8888/mtt'</Custom>" >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer Throughput\">curl -s -H 'Host: edi18' 'http://$$host:8889/th'</Custom>" >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer MTT\">curl -s -H 'Host: edi18' 'http://$$host:8889/mtt'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer Throughput\">curl -s 'http://$$host:8888/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer MTT\">curl -s 'http://$$host:8888/mtt'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer Throughput\">curl -s 'http://$$host:8889/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer MTT\">curl -s 'http://$$host:8889/mtt'</Custom>" >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	echo "</Monitoring>"                                                                          >> monitoring.xml
