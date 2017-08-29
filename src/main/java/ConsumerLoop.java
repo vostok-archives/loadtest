@@ -7,6 +7,7 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.record.TimestampType;
 import org.rapidoid.log.Log;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -69,7 +70,14 @@ public class ConsumerLoop implements Runnable {
                 for (ConsumerRecord<String, GenericRecord> record : records) {
                     lastRecord = record;
                     lastTravelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
-                    int  payloadSize = ((byte[])lastRecord.value().get("payload")).length;
+                    ByteBuffer payload = (ByteBuffer) lastRecord.value().get("payload");
+                    int payloadSize;
+                    if (payload.hasArray())
+                        payloadSize = payload.array().length;
+                    else {
+                        payload.flip();
+                        payloadSize = payload.remaining();
+                    }
                     metricsReporter.consumed(lastTravelTime, payloadSize);
                 }
                 if (verboseLogging) {
