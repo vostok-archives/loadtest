@@ -20,7 +20,7 @@ namespace ConsumerTest
                 .Set("auto.commit.interval.ms", 1000)
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("queued.min.messages", 10000000)
-                .Set("fetch.message.max.bytes", 450876)
+                .Set("fetch.message.max.bytes", 500000)
                 .Set("fetch.wait.max.ms", 500);
 
             var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver());
