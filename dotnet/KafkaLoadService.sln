@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsumerTest", "ConsumerTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsumerTest2", "ConsumerTest2\ConsumerTest2.csproj", "{594BF534-DB42-4056-90D3-B15E4C1790FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KafkaKestrelService", "KafkaKestrelService\KafkaKestrelService.csproj", "{71C3959C-AF88-4221-A547-211DB5AB223B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{594BF534-DB42-4056-90D3-B15E4C1790FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{594BF534-DB42-4056-90D3-B15E4C1790FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{594BF534-DB42-4056-90D3-B15E4C1790FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71C3959C-AF88-4221-A547-211DB5AB223B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71C3959C-AF88-4221-A547-211DB5AB223B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71C3959C-AF88-4221-A547-211DB5AB223B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71C3959C-AF88-4221-A547-211DB5AB223B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
