@@ -77,7 +77,7 @@ public class EntryPoint {
         props.put("auto.commit.interval.ms", 1000);
         props.put("session.timeout.ms", 60000);
         props.put("max.poll.records", 128 * 1000);
-        props.put("max.partition.fetch.bytes", 10485760);
+        props.put("max.partition.fetch.bytes", 104857600);
         props.put("fetch.min.bytes", 1);
         props.put("fetch.max.bytes", 524288000);
         props.put("fetch.max.wait.ms", 500);
