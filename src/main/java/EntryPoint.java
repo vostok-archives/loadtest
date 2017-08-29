@@ -51,13 +51,13 @@ public class EntryPoint {
         props.put("acks", "1");
         props.put("retries", 0);
         props.put("linger.ms", 20);
-        props.put("batch.size", 64 * 1000);
+        props.put("batch.size", 128 * 1000);
         props.put("buffer.memory", 256 * 1000 * 1000);
         props.put("max.request.size", 20 * 1000 * 1000);
         props.put("compression.type", "none");
         props.put("metadata.fetch.timeout.ms", 25);
         props.put("max.block.ms", 25);
-        props.put("max.in.flight.requests.per.connection", 500);
+        props.put("max.in.flight.requests.per.connection", 1000);
         props.put("key.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 
@@ -76,8 +76,8 @@ public class EntryPoint {
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
         props.put("session.timeout.ms", 60000);
-        props.put("max.poll.records", 64 * 1000);
-        props.put("max.partition.fetch.bytes", 1048576);
+        props.put("max.poll.records", 128 * 1000);
+        props.put("max.partition.fetch.bytes", 10485760);
         props.put("fetch.min.bytes", 1);
         props.put("fetch.max.bytes", 52428800);
         props.put("fetch.max.wait.ms", 500);
