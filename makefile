@@ -67,8 +67,6 @@ fire: pull
 		echo "    <Disk devices='[\"sda3\",\"sda4\"]'></Disk>"                                    >> monitoring.xml ; \
 		echo "    <Net interfaces='[\"team0\"]'></Net>"                                           >> monitoring.xml ; \
 		echo "    <Netstat />"                                                                    >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Throughput\">curl -s -H 'Host: edi18' 'http://$$host:8889/th'</Custom>" >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"MTT\">curl -s -H 'Host: edi18' 'http://$$host:8889/mtt'</Custom>" >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
 	for host in edi18 icat-test01 icat-test02 icat-test03 ; do \
