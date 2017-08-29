@@ -51,9 +51,23 @@ namespace ConsumerTest
         public T Deserialize(byte[] data)
         {
             var avroSerializer = AvroSerializer.Create<T>();
-            using (var memoryStream = new MemoryStream(data.Skip(5).ToArray()))
+            using (var memoryStream = new MemoryStream(Skip(data, 5).ToArray()))
             {
                 return avroSerializer.Deserialize(memoryStream);
+            }
+        }
+
+        private static IEnumerable<TItem> Skip<TItem>(IEnumerable<TItem> source, int count)
+        {
+            var skipCount = 0;
+            foreach (var item in source)
+            {
+                if (skipCount < count)
+                {
+                    skipCount++;
+                    continue;
+                }
+                yield return item;
             }
         }
     }
