@@ -24,7 +24,7 @@ public class MetricsReporter {
                 totalSize = 0;
                 totalTravelTimeMs = 0;
             }
-            Log.info(String.format("Throughput: %s events/sec; ThroughputMb: %s Mb/sec; MeanTravelTime: %s ms", getLastThroughput(), getLastThroughputMb(), getLastMeanTravelTime()));
+            Log.info(String.format("Thr-put: %s events/sec; Thr-putMb: %s Mb/sec; MeanTrTime: %s ms", getLastThroughput(), getLastThroughputMb(), getLastMeanTravelTime()));
         }, 0, reportingIntervalSeconds, TimeUnit.SECONDS);
     }
 
