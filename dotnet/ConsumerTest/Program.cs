@@ -18,8 +18,8 @@ namespace ConsumerTest
                 .SetGroupId("test-group2")
                 .Set("auto.offset.reset", "latest")
                 .Set("auto.commit.interval.ms", 1000)
-                .Set("session.timeout.ms", 60000)
-                .Set("fetch.message.max.bytes", 52428800)
+                //.Set("session.timeout.ms", 60000)
+                .Set("fetch.message.max.bytes", 500876)
                 .Set("fetch.wait.max.ms", 500);
 
             var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver());
