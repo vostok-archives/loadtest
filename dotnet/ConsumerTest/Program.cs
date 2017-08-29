@@ -20,18 +20,26 @@ namespace ConsumerTest
                 .Set("auto.commit.interval.ms", 1000)
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("queued.min.messages", 10000000)
-                .Set("fetch.message.max.bytes", 510000)
-                .Set("fetch.wait.max.ms", 500);
+                .Set("fetch.message.max.bytes", 80000)
+                .Set("message.max.bytes", 1000000000)
+                .Set("message.copy.max.bytes", 1000000000)
+                .Set("receive.message.max.bytes", 1000000000)
+                .Set("max.in.flight.requests.per.connection", 1000000)
+                .Set("socket.send.buffer.bytes", 100000000)
+                .Set("socket.receive.buffer.bytes", 100000000)
+                .Set("queued.min.messages", 10000000)
+                .Set("fetch.min.bytes", 1000)
+                .Set("queued.max.messages.kbytes", 1000000000)
+                .Set("fetch.wait.max.ms", 10000);
 
-            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver());
+            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new TestKafkaModelObserver());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
                 var oldvalue = Counter.Value;
                 Thread.Sleep(TimeSpan.FromMilliseconds(StepMilliseconds));
-                var newValue = Counter.Value;
-                Console.WriteLine($"{((double)newValue - oldvalue)/StepMilliseconds*1000}\t{newValue}");
+                Console.WriteLine(TimestampInfoManager.GetReport(oldvalue, StepMilliseconds));
             }
 
             kafkaConsumer.Dispose();
@@ -145,7 +153,6 @@ namespace ConsumerTest
     {
         private static DateTime now;
         private static long timestamp;
-        private static int counter;
         private static readonly object lockObject = new object();
 
         public static void SetTimestamp(long timestampInMilliseconds)
@@ -154,13 +161,21 @@ namespace ConsumerTest
             {
                 now = DateTime.Now;
                 timestamp = timestampInMilliseconds;
-                counter++;
+                Count++;
             }
         }
 
-        public static string GetReport()
+        public static int Count { get; set; }
+
+        public static string GetReport(int prevCount, int timeInMilliseconds)
         {
-            return $"now: {now}, now milliseconds:{(now - new DateTime(1970, 01, 01)).TotalMilliseconds}, timestamp: {timestamp}, count: {counter}";
+            var countPerSeconds = ((double)Count - prevCount) / timeInMilliseconds * 1000;
+            return $"speed: {countPerSeconds}, count: {Count}, timestamp: {timestamp}, diff:{GetDiff()},";
+        }
+
+        private static int GetDiff()
+        {
+            return (int) (now - new DateTime(1970, 01, 01) - TimeSpan.FromMilliseconds(timestamp)).TotalMilliseconds;
         }
     }
 }

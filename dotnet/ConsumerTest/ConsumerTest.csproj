@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Hadoop.Avro" Version="1.5.6" />
+    <PackageReference Include="Microsoft.Avro.Core" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
