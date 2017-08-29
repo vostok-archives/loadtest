@@ -71,13 +71,8 @@ public class ConsumerLoop implements Runnable {
                     lastRecord = record;
                     lastTravelTime = currentTimestamp - (long) lastRecord.value().get("timestamp");
                     ByteBuffer payload = (ByteBuffer) lastRecord.value().get("payload");
-                    int payloadSize;
-                    if (payload.hasArray())
-                        payloadSize = payload.array().length;
-                    else {
-                        payload.flip();
-                        payloadSize = payload.remaining();
-                    }
+                    payload.flip();
+                    int payloadSize = payload.remaining();
                     metricsReporter.consumed(lastTravelTime, payloadSize);
                 }
                 if (verboseLogging) {
