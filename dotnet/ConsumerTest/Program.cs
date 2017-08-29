@@ -51,7 +51,7 @@ namespace ConsumerTest
         public T Deserialize(byte[] data)
         {
             var avroSerializer = AvroSerializer.Create<T>();
-            using (var memoryStream = new MemoryStream(data))
+            using (var memoryStream = new MemoryStream(data.Skip(5).ToArray()))
             {
                 return avroSerializer.Deserialize(memoryStream);
             }
