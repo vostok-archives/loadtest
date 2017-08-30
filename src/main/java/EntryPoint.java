@@ -6,6 +6,7 @@ import org.rapidoid.net.Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.util.Properties;
 
 public class EntryPoint {
@@ -51,7 +52,7 @@ public class EntryPoint {
         props.put("acks", "1");
         props.put("retries", 0);
         props.put("linger.ms", 20);
-        props.put("batch.size", 128 * 1000);
+        props.put("batch.size", 100 * 1000);
         props.put("buffer.memory", 256 * 1000 * 1000);
         props.put("max.request.size", 20 * 1000 * 1000);
         props.put("compression.type", "none");
@@ -69,18 +70,18 @@ public class EntryPoint {
     }
 
     private static void RunConsumerGroup(Properties props, Schema schema, String topic, MetricsReporter metricsReporter, int numConsumers, int goBackOnRebalanceSeconds) throws IOException {
-        String hostName = java.net.InetAddress.getLocalHost().getHostName();
-        Log.info("Starting consumer group " + hostName);
+        String groupId = "kgroup-" + InetAddress.getLocalHost().getHostName();
+        Log.info("Starting consumer group " + groupId);
 
-        props.put("group.id", "kgroup-" + hostName);
+        props.put("group.id", groupId);
         props.put("auto.offset.reset", "latest");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", 1000);
         props.put("session.timeout.ms", 60000);
-        props.put("max.poll.records", 1000 * 1000);
-        props.put("max.partition.fetch.bytes", 104857600);
+        props.put("max.poll.records", 100 * 1000);
+        props.put("max.partition.fetch.bytes", 10485760);
         props.put("fetch.min.bytes", 1);
-        props.put("fetch.max.bytes", 524288000);
+        props.put("fetch.max.bytes", 52428800);
         props.put("fetch.max.wait.ms", 500);
         props.put("key.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");

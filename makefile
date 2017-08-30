@@ -78,9 +78,11 @@ fire: pull
 	done
 	for host in edi18 icat-test04 icat-test05 ; do \
 		echo "  <Host address=\"$$host\" comment=\"$$host\">"                                     >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer Throughput\">curl -s http://$$host:8888/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer Throughput events/sec\">curl -s http://$$host:8888/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer Throughput MB/sec\">curl -s http://$$host:8888/thmb'</Custom>" >> monitoring.xml ; \
 		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Producer MTT\">curl -s http://$$host:8888/mtt'</Custom>" >> monitoring.xml ; \
-		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer Throughput\">curl -s 'http://$$host:8889/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer Throughput events/sec\">curl -s 'http://$$host:8889/th'</Custom>" >> monitoring.xml ; \
+		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer Throughput MB/sec\">curl -s 'http://$$host:8889/thmb'</Custom>" >> monitoring.xml ; \
 		echo "    <Custom diff=\"1\" measure=\"call\" label=\"Consumer MTT\">curl -s 'http://$$host:8889/mtt'</Custom>" >> monitoring.xml ; \
 		echo "  </Host>"                                                                          >> monitoring.xml ; \
 	done
