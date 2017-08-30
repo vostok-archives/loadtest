@@ -44,19 +44,19 @@ namespace ConsumerTest
                 new ParameterInfo
                 {
                     Name = "auto.commit.interval.ms",
-                    MinValue = 1,
-                    MaxValue = 100000
+                    MinValue = 20000,
+                    MaxValue = 52000
                 }, 
                 new ParameterInfo
                 {
                     Name = "session.timeout.ms",
-                    MinValue = 1000,
-                    MaxValue = 60000
+                    MinValue = 24600,
+                    MaxValue = 71800
                 }, 
                 new ParameterInfo
                 {
                     Name = "message.max.bytes",
-                    MinValue = 1000,
+                    MinValue = 100000,
                     MaxValue = 10000000
                 }, 
                 new ParameterInfo
@@ -104,7 +104,7 @@ namespace ConsumerTest
             };
             for (var i = 0; i < 10; i++)
             {
-                const int pointCount = 10;
+                const int pointCount = 5;
                 foreach (var parameterInfo in parameterInfos)
                 {
                     var currentParams = parameterInfos.ToDictionary(x => x.Name, x => (x.MaxValue + x.MinValue) / 2);
@@ -114,7 +114,7 @@ namespace ConsumerTest
                     for (var j = 0; j <= pointCount; j++)
                     {
                         currentParams[parameterInfo.Name] = (int) Math.Round(parameterInfo.MinValue + j * diff);
-                        Log("Current optimized param: " + parameterInfo.Name);
+                        Log("Current optimized param: " + parameterInfo.Name + " = " + currentParams[parameterInfo.Name]);
                         Log("test params:\n  " + string.Join("\n  ", currentParams.Select(x => $"{x.Key} => {x.Value}")));
 
                         var result = KafkaQueueFiller.Run(currentParams);
@@ -124,8 +124,9 @@ namespace ConsumerTest
                             bestPoint = j;
                         }
                     }
-                    parameterInfo.MinValue = bestPoint == 0 ? parameterInfo.MinValue : (int)(parameterInfo.MinValue + (bestPoint-1) * diff);
                     parameterInfo.MaxValue = bestPoint == pointCount ? parameterInfo.MaxValue : (int)(parameterInfo.MinValue + (bestPoint + 1) * diff);
+                    parameterInfo.MinValue = bestPoint == 0 ? parameterInfo.MinValue : (int)(parameterInfo.MinValue + (bestPoint-1) * diff);
+                    Log("ParameterInfos:\n  " + string.Join("\n  ", parameterInfos.Select(x => $"{x.Name} => {x.MinValue} .. {x.MaxValue}")));
                 }
             }
         }

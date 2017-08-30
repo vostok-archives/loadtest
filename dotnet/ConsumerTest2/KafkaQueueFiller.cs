@@ -57,10 +57,13 @@ namespace ConsumerTest2
                         {
                             var prevSuccess = successCount;
                             Thread.Sleep(stepMilliseconds);
-                            counter++;
                             var newSuccess = successCount;
                             var rps = (double)(newSuccess - prevSuccess) / stepMilliseconds * 1000;
-                            avgRps = (double)successCount / counter / stepMilliseconds * 1000;
+                            if (avgRps > 0 || rps > 0)
+                            {
+                                counter++;
+                                avgRps = (double)successCount / counter / stepMilliseconds * 1000;
+                            }
                             Program.Log($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
                         }
                     }, cancellationToken, TaskCreationOptions.LongRunning);
@@ -78,9 +81,9 @@ namespace ConsumerTest2
                             tasks.Add(task);
                         }
                     }
-                    Thread.Sleep(60000);
+                    Thread.Sleep(10000);
                     cancellationTokenSource.Cancel();
-                    Thread.Sleep(5000);
+                    Task.WaitAll(tasks.ToArray());
                 }
 
             }
@@ -104,7 +107,7 @@ namespace ConsumerTest2
                 Interlocked.Increment(ref requestCount);
                 try
                 {
-                    for (var i = 0; i < 1000; i++)
+                    for (var i = 0; i < 100; i++)
                     {
                         producer.Produce(Topic, Guid.NewGuid(), body);
                     }
