@@ -37,14 +37,14 @@ namespace ConsumerTest
                 .SetRetries(0)
                 //.SetCompression(CompressionCodes.none)
                 .Set("auto.offset.reset", "latest")
-                .Set("auto.commit.interval.ms", parameters["auto.commit.interval.ms"]) //1000
-                .Set("session.timeout.ms", parameters["session.timeout.ms"]) //60000
-                .Set("fetch.message.max.bytes", parameters["fetch.message.max.bytes"]) //52428800
-                .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
+            foreach (var parameter in parameters)
+            {
+                kafkaSetting.Set(parameter.Key, parameter.Value);
+            }
 
-            KafkaQueueFiller.Run();
+            KafkaQueueFiller.Run(parameters);
 
             var consumers = Enumerable.Range(1, 1)
                 .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, KafkaQueueFiller.Topic, new SimpleDesiralizer(),

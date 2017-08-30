@@ -127,7 +127,7 @@ namespace KafkaProducerService
                     context.Response.StatusCode = 200;
                     var buffer = Encoding.UTF8.GetBytes("ok");
                     context.Response.Headers["Content-Length"] = buffer.Length.ToString();
-                    for (var i = 0; i < 100; i++)
+                    for (var i = 0; i < 1000; i++)
                     {
                         kafkaProducer.Produce("topic", Guid.NewGuid(), body);
                     }

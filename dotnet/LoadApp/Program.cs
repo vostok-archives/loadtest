@@ -38,14 +38,14 @@ namespace LoadApp
                     var newSuccess = successCount;
                     var rps = (double)(newSuccess - prevSuccess) / StepMilliseconds * 1000;
                     var avgRps = (double)successCount / counter / StepMilliseconds * 1000;
-                    Console.WriteLine($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}");
+                    Console.WriteLine($"tasks= {tasks.Count}, success = {successCount}, error = {errorCount}, perSecond={rps}, avg={avgRps}, all={requestCount}");
                 }
             });
             printTask.Start();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 5; i++)
             {
-                for (var j = 0; j < 200; j++)
+                for (var j = 0; j < 1; j++)
                 {
                     var task = new Task(() =>
                     {
@@ -54,6 +54,7 @@ namespace LoadApp
                     task.Start();
                     tasks.Add(task);
                 }
+                Thread.Sleep(3000);
             }
             Thread.Sleep(60000);
             cancellationTokenSource.Cancel();
