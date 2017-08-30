@@ -33,7 +33,7 @@ namespace ConsumerTest
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("fetch.wait.max.ms", 10000);
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new TestKafkaModelObserver());
+            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver<byte[]>());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
