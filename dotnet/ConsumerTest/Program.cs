@@ -34,7 +34,7 @@ namespace ConsumerTest
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("fetch.wait.max.ms", 10000);
 
-            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver<byte[]>());
+            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new TestKafkaModelObserver());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
@@ -52,9 +52,15 @@ namespace ConsumerTest
 
     public class AvroDeserializer<T> : IDeserializer<T>
     {
+        private readonly IAvroSerializer<T> avroSerializer;
+
+        public AvroDeserializer()
+        {
+            avroSerializer = AvroSerializer.Create<T>();
+        }
+
         public T Deserialize(byte[] data)
         {
-            var avroSerializer = AvroSerializer.Create<T>();
             var buffer = data.Skip(5).ToArray();
             using (var memoryStream = new MemoryStream(buffer))
             {
