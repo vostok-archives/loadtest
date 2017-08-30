@@ -34,9 +34,9 @@ public class LoadGenerator {
             GenericRecord kevent = new GenericData.Record(schema);
             kevent.put("timestamp", timestamp);
             kevent.put("payload", generatePayload(eventSize));
-            ProducerRecord<String, GenericRecord> data = new ProducerRecord<>(topic, kevent);
+            ProducerRecord<String, GenericRecord> producerRecord = new ProducerRecord<>(topic, null, timestamp, null, kevent);
             if (publishToKafka)
-                producer.send(data);
+                producer.send(producerRecord);
         }
         return eventBatchSize;
     }
