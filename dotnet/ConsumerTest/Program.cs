@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using Confluent.Kafka.Serialization;
@@ -32,15 +33,16 @@ namespace ConsumerTest
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("fetch.wait.max.ms", 10000);
 
-            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver());
+            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver<byte[]>());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
-                var oldvalue = Counter.Value;
                 Thread.Sleep(TimeSpan.FromMilliseconds(StepMilliseconds));
-                var newValue = Counter.Value;
-                Console.WriteLine($"{((double)newValue - oldvalue) / StepMilliseconds * 1000}\t{newValue}");
+
+                Console.WriteLine($"count: {MetricsReporter.TotalCount}, throughput: {MetricsReporter.LastThroughput}"
+                    + $", throughput MB: {(double) MetricsReporter.LastThroughputBytes / 1000 / 1000:0.00}"
+                    + $", mean travel time ms {MetricsReporter.LastMeanTravelTimeMs}");
             }
 
             kafkaConsumer.Dispose();
@@ -52,7 +54,8 @@ namespace ConsumerTest
         public T Deserialize(byte[] data)
         {
             var avroSerializer = AvroSerializer.Create<T>();
-            using (var memoryStream = new MemoryStream(data))
+            var buffer = data.Skip(5).ToArray();
+            using (var memoryStream = new MemoryStream(buffer))
             {
                 return avroSerializer.Deserialize(memoryStream);
             }
@@ -98,7 +101,7 @@ namespace ConsumerTest
         }
     }
 
-    public class CounterObserver : IObserver<byte[]>
+    public class CounterObserver<T> : IObserver<T>
     {
         public void OnCompleted()
         { }
@@ -108,9 +111,9 @@ namespace ConsumerTest
             Console.WriteLine(error);
         }
 
-        public void OnNext(byte[] value)
+        public void OnNext(T value)
         {
-            Counter.Inc();
+            MetricsReporter.Add(1, 0, 0);
         }
     }
 
@@ -137,7 +140,7 @@ namespace ConsumerTest
 
         public void OnNext(TestKafkaModel value)
         {
-            TimestampInfoManager.SetTimestamp(value.Timestamp);
+            MetricsReporter.Add(1, value.Payload.Length, value.Timestamp);
         }
     }
 
@@ -148,35 +151,5 @@ namespace ConsumerTest
         public long Timestamp { get; set; }
         [DataMember(Name = "payload")]
         public byte[] Payload { get; set; }
-    }
-
-    public static class TimestampInfoManager
-    {
-        private static DateTime now;
-        private static long timestamp;
-        private static readonly object lockObject = new object();
-
-        public static void SetTimestamp(long timestampInMilliseconds)
-        {
-            lock (lockObject)
-            {
-                now = DateTime.Now;
-                timestamp = timestampInMilliseconds;
-                Count++;
-            }
-        }
-
-        public static int Count { get; set; }
-
-        public static string GetReport(int prevCount, int timeInMilliseconds)
-        {
-            var countPerSeconds = ((double)Count - prevCount) / timeInMilliseconds * 1000;
-            return $"speed: {countPerSeconds}, count: {Count}, timestamp: {timestamp}, diff:{GetDiff()},";
-        }
-
-        private static int GetDiff()
-        {
-            return (int) (now - new DateTime(1970, 01, 01) - TimeSpan.FromMilliseconds(timestamp)).TotalMilliseconds;
-        }
     }
 }
