@@ -20,7 +20,7 @@ namespace ConsumerTest
                 .Set("auto.commit.interval.ms", 1000)
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("queued.min.messages", 10000000)
-                .Set("fetch.message.max.bytes", 80000)
+                .Set("fetch.message.max.bytes", 10000000)
                 .Set("message.max.bytes", 1000000000)
                 .Set("message.copy.max.bytes", 1000000000)
                 .Set("receive.message.max.bytes", 1000000000)
@@ -28,18 +28,19 @@ namespace ConsumerTest
                 .Set("socket.send.buffer.bytes", 100000000)
                 .Set("socket.receive.buffer.bytes", 100000000)
                 .Set("queued.min.messages", 10000000)
-                .Set("fetch.min.bytes", 1000)
+                .Set("fetch.min.bytes", 1)
                 .Set("queued.max.messages.kbytes", 1000000000)
                 .Set("fetch.wait.max.ms", 10000);
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroDeserializer<TestKafkaModel>(), new TestKafkaModelObserver());
+            var kafkaConsumer = new KafkaConsumer<byte[]>(kafkaSetting, "ktopic-with-ts", new DefaultDeserializer(), new CounterObserver());
 
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
                 var oldvalue = Counter.Value;
                 Thread.Sleep(TimeSpan.FromMilliseconds(StepMilliseconds));
-                Console.WriteLine(TimestampInfoManager.GetReport(oldvalue, StepMilliseconds));
+                var newValue = Counter.Value;
+                Console.WriteLine($"{((double)newValue - oldvalue) / StepMilliseconds * 1000}\t{newValue}");
             }
 
             kafkaConsumer.Dispose();
@@ -51,26 +52,10 @@ namespace ConsumerTest
         public T Deserialize(byte[] data)
         {
             var avroSerializer = AvroSerializer.Create<T>();
-            using (var memoryStream = new MemoryStream(Skip(data, 5)))
+            using (var memoryStream = new MemoryStream(data))
             {
                 return avroSerializer.Deserialize(memoryStream);
             }
-        }
-
-        private static TItem[] Skip<TItem>(TItem[] source, int count)
-        {
-            var skipCount = 0;
-            var result = new List<TItem>();
-            foreach (var item in source)
-            {
-                if (skipCount < count)
-                {
-                    skipCount++;
-                    continue;
-                }
-                result.Add(item);
-            }
-            return result.ToArray();
         }
     }
 
