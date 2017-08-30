@@ -17,7 +17,7 @@ namespace ConsumerTest2
         private static int successCount;
         private static int errorCount;
 
-        private static void OnMessageDelivered(byte [] data)
+        private static void OnMessageDelivered(byte[] data)
         {
             Interlocked.Increment(ref successCount);
         }
@@ -32,6 +32,16 @@ namespace ConsumerTest2
                 .SetBootstrapServers(new Uri(Program.KafkaUri))
                 .SetAcks(1)
                 .SetRetries(0)
+                //.Set("auto.commit.interval.ms", 28120)
+                //.Set("session.timeout.ms", 41904)
+                //.Set("message.max.bytes", 8416000)
+                //.Set("message.copy.max.bytes", 920000)
+                //.Set("receive.message.max.bytes", 92000000)
+                //.Set("max.in.flight.requests.per.connection", 128000)
+                //.Set("queue.buffering.max.messages", 9001000)
+                //.Set("queue.buffering.max.kbytes", 1887535)
+                //.Set("queue.buffering.max.ms", 7500)
+                //.Set("batch.num.messages", 500500)
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
             foreach (var parameter in parameters)

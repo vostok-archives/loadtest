@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using ConsumerTest2;
@@ -52,18 +53,23 @@ namespace ConsumerTest
                 .ToArray();
             var counter = 0;
             const int stepMilliseconds = 1000;
-            double avgRps;
+            double avgRps = 0;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             while (true)
             {
                 var prevCount = MessageCount;
                 Thread.Sleep(TimeSpan.FromMilliseconds(stepMilliseconds));
-                counter++;
                 var newCount = MessageCount;
                 var rps = (double)(newCount - prevCount) / stepMilliseconds * 1000;
-                avgRps = (double)newCount / counter / stepMilliseconds * 1000;
+                if (avgRps > 0 || rps > 0)
+                {
+                    counter++;
+                    avgRps = (double)newCount / counter / stepMilliseconds * 1000;
+                }
                 //Console.WriteLine(DiffTimestampManager.GetReport());
                 Program.Log($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
-                if (Math.Abs(rps) < 1 && newCount > 0)
+                if (Math.Abs(rps) < 1 && newCount > 0 || stopwatch.ElapsedMilliseconds > 60000)
                     break;
             }
             foreach (var consumer in consumers)

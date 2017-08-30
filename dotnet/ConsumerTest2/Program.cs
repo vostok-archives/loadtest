@@ -41,66 +41,73 @@ namespace ConsumerTest
             //    .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
             var parameterInfos = new ParameterInfo[]
             {
+                //new ParameterInfo()
+                //{
+                //    Name = "fetch.message.max.bytes",
+                //    MinValue = 1000000,
+                //    MaxValue = 100000000
+                //}, 
+
                 new ParameterInfo
                 {
                     Name = "auto.commit.interval.ms",
-                    MinValue = 20000,
-                    MaxValue = 52000
-                }, 
+                    MinValue = 25000,
+                    MaxValue = 32800
+                },
                 new ParameterInfo
                 {
                     Name = "session.timeout.ms",
-                    MinValue = 24600,
-                    MaxValue = 71800
-                }, 
+                    MinValue = 35600,
+                    MaxValue = 43480
+                },
                 new ParameterInfo
                 {
                     Name = "message.max.bytes",
-                    MinValue = 100000,
+                    MinValue = 8020000,
                     MaxValue = 10000000
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "message.copy.max.bytes",
-                    MinValue = 0,
+                    MinValue = 600000,
                     MaxValue = 1000000
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "receive.message.max.bytes",
-                    MinValue = 1000,
+                    MinValue = 80000000,
                     MaxValue = 100000000
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "max.in.flight.requests.per.connection",
-                    MinValue = 1,
-                    MaxValue = 1000000
-                }, 
+                    MinValue = 80000,
+                    MaxValue = 160000
+                },
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.messages",
-                    MinValue = 1,
+                    MinValue = 8002000,
                     MaxValue = 10000000
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.kbytes",
-                    MinValue = 1,
+                    MinValue = 1677920,
                     MaxValue = 2097151
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.ms",
-                    MinValue = 0,
+                    MinValue = 5000,
                     MaxValue = 10000
-                }, 
+                },
                 new ParameterInfo
                 {
                     Name = "batch.num.messages",
-                    MinValue = 1,
+                    MinValue = 1000,
                     MaxValue = 1000000
-                }, 
+                },
             };
             for (var i = 0; i < 10; i++)
             {
@@ -118,6 +125,7 @@ namespace ConsumerTest
                         Log("test params:\n  " + string.Join("\n  ", currentParams.Select(x => $"{x.Key} => {x.Value}")));
 
                         var result = KafkaQueueFiller.Run(currentParams);
+                        //var result = KafkaConsumerTest.Run(currentParams);
                         if (result > bestResult)
                         {
                             bestResult = result;
