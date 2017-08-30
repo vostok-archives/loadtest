@@ -59,6 +59,7 @@ namespace KafkaLoadService.Core
                     kafkaProducer.Produce(TopicName, Guid.Empty, body);
                 }
             }
+            MetricsReporter.Produced(requestCount, bodySize);
         }
 
         private static byte[] GenerateBody(Random random, int bodySize)

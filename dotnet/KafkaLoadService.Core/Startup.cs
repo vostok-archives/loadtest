@@ -31,6 +31,8 @@ namespace KafkaLoadService.Core
             routeBuilder.AddRoute<KafkaLoadController>("kload100", c => c.Load100Async());
             routeBuilder.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000Async());
             routeBuilder.AddRoute<KafkaLoadController>("gen", c => c.GenerateAsync());
+            routeBuilder.AddRoute<MetricsReportController>("th", c => c.GetLastThroghput());
+            routeBuilder.AddRoute<MetricsReportController>("thmb", c => c.GetLastThroghputMb());
         }
     }
 }
