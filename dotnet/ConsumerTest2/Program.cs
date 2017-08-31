@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ConsumerTest2
 {
@@ -13,7 +14,7 @@ namespace ConsumerTest2
 
     public class Program
     {
-        public const string KafkaUri = "http://localhost:9092";
+        public readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "http://localhost:9092" : "http://icat-test01:9092";
         public const string Topic = "dot-net";
 
         private static readonly object lockObject = new object();
