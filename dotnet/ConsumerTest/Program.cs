@@ -6,6 +6,8 @@ using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Hadoop.Avro;
 
 namespace ConsumerTest
@@ -19,7 +21,22 @@ namespace ConsumerTest
 
             StartConsoleReprot();
 
+            StartHttpServer();
+
             kafkaConsumer.Dispose();
+        }
+
+        private static void StartHttpServer()
+        {
+            var baseAddress = $"http://*:{8889}/";
+
+            new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .UseUrls(baseAddress)
+                .Build()
+                .Run();
         }
 
         private static void StartConsoleReprot()
