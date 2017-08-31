@@ -71,15 +71,21 @@ namespace ConsumerTest
 
     public class AvroTestKafkaModelDeserializer : IDeserializer<TestKafkaModel>
     {
-        public TestKafkaModel Deserialize(byte[] data)
+        private readonly IAvroSerializer<object> avroSerializer;
+
+        public AvroTestKafkaModelDeserializer()
         {
             var schemaString = "{\"type\": \"record\", " +
-                                  "\"name\": \"kevent\"," +
-                                  "\"fields\": [" +
-                                  "{\"name\": \"timestamp\", \"type\": \"long\"}," +
-                                  "{\"name\": \"payload\", \"type\": \"bytes\"}" +
-                                  "]}";
-            var avroSerializer = AvroSerializer.CreateGeneric(schemaString);
+                               "\"name\": \"kevent\"," +
+                               "\"fields\": [" +
+                               "{\"name\": \"timestamp\", \"type\": \"long\"}," +
+                               "{\"name\": \"payload\", \"type\": \"bytes\"}" +
+                               "]}";
+            avroSerializer = AvroSerializer.CreateGeneric(schemaString);
+        }
+
+        public TestKafkaModel Deserialize(byte[] data)
+        {
             try
             {
                 using (var memoryStream = new MemoryStream(data))
