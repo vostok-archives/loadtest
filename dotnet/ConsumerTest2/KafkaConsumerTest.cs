@@ -25,11 +25,6 @@ namespace ConsumerTest2
 
             public void OnNext(Message<byte[], byte[]> value)
             {
-                throw new NotImplementedException();
-            }
-
-            public void OnNext(byte[] value)
-            {
                 Interlocked.Increment(ref MessageCount);
             }
         }

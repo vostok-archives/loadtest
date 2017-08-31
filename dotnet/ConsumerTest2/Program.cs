@@ -31,6 +31,7 @@ namespace ConsumerTest2
 
         static void Main(string[] args)
         {
+            Log("kafka: " + KafkaUri);
             //Util.ConfigureLog4Net();
             //Logger = LogManager.GetLogger(typeof(Program));
             //.Set("auto.commit.interval.ms", parameters["auto.commit.interval.ms"]) //1000
