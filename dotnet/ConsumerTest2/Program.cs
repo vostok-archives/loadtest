@@ -14,7 +14,7 @@ namespace ConsumerTest2
 
     public class Program
     {
-        public readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "http://localhost:9092" : "http://icat-test01:9092";
+        public static readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "http://localhost:9092" : "http://icat-test01:9092";
         public const string Topic = "dot-net";
 
         private static readonly object lockObject = new object();
@@ -37,11 +37,12 @@ namespace ConsumerTest2
             //    .Set("session.timeout.ms", parameters["session.timeout.ms"]) //60000
             //    .Set("fetch.message.max.bytes", parameters["fetch.message.max.bytes"]) //52428800
             //    .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
+            KafkaProducerTest.Run(new Dictionary<string, int>());
             KafkaConsumerTest.Run(new Dictionary<string, int>());
             //ParamsOptimization();
         }
 
-        private static void ParamsOptimization()
+        private static void ParamsOptimization(Func<Dictionary<string,int>,double> func)
         {
             var parameterInfos = new[]
             {
@@ -129,7 +130,7 @@ namespace ConsumerTest2
                         Log("test params:\n  " + String.Join("\n  ", currentParams.Select(x => $"{x.Key} => {x.Value}")));
 
                         //var result = KafkaQueueFiller.Run(currentParams);
-                        var result = KafkaConsumerTest.Run(currentParams);
+                        var result = func(currentParams);
                         if (result > bestResult)
                         {
                             bestResult = result;
