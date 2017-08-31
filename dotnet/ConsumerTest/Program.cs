@@ -19,7 +19,7 @@ namespace ConsumerTest
         {
             var kafkaConsumer = CreateKafkaConsumer();
 
-            new Task(StartConsoleReprot).Start();
+            //new Task(StartConsoleReprot).Start();
 
             StartHttpServer();
             kafkaConsumer.Dispose();
