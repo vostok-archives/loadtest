@@ -3,11 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Hadoop.Avro;
 
 namespace ConsumerTest
@@ -19,10 +19,9 @@ namespace ConsumerTest
         {
             var kafkaConsumer = CreateKafkaConsumer();
 
-            StartConsoleReprot();
+            new Task(StartConsoleReprot).Start();
 
             StartHttpServer();
-
             kafkaConsumer.Dispose();
         }
 
