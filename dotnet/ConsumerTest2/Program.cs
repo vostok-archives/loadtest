@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using ConsumerTest2;
-using KafkaClient;
 
-namespace ConsumerTest
+namespace ConsumerTest2
 {
-
     public class ParameterInfo {
         public string Name { get; set; }
         public int MaxValue { get; set; }
         public int MinValue { get; set; }
     }
 
-    class Program
+    public class Program
     {
         public const string KafkaUri = "http://localhost:9092";
+        public const string Topic = "dot-net";
 
         private static readonly object lockObject = new object();
         public static void Log(string msg)
@@ -39,7 +36,13 @@ namespace ConsumerTest
             //    .Set("session.timeout.ms", parameters["session.timeout.ms"]) //60000
             //    .Set("fetch.message.max.bytes", parameters["fetch.message.max.bytes"]) //52428800
             //    .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
-            var parameterInfos = new ParameterInfo[]
+            KafkaConsumerTest.Run(new Dictionary<string, int>());
+            //ParamsOptimization();
+        }
+
+        private static void ParamsOptimization()
+        {
+            var parameterInfos = new[]
             {
                 //new ParameterInfo()
                 //{
@@ -117,24 +120,29 @@ namespace ConsumerTest
                     var currentParams = parameterInfos.ToDictionary(x => x.Name, x => (x.MaxValue + x.MinValue) / 2);
                     double bestResult = 0;
                     var bestPoint = 0;
-                    var diff = (double)(parameterInfo.MaxValue - parameterInfo.MinValue) / pointCount;
+                    var diff = (double) (parameterInfo.MaxValue - parameterInfo.MinValue) / pointCount;
                     for (var j = 0; j <= pointCount; j++)
                     {
                         currentParams[parameterInfo.Name] = (int) Math.Round(parameterInfo.MinValue + j * diff);
                         Log("Current optimized param: " + parameterInfo.Name + " = " + currentParams[parameterInfo.Name]);
-                        Log("test params:\n  " + string.Join("\n  ", currentParams.Select(x => $"{x.Key} => {x.Value}")));
+                        Log("test params:\n  " + String.Join("\n  ", currentParams.Select(x => $"{x.Key} => {x.Value}")));
 
-                        var result = KafkaQueueFiller.Run(currentParams);
-                        //var result = KafkaConsumerTest.Run(currentParams);
+                        //var result = KafkaQueueFiller.Run(currentParams);
+                        var result = KafkaConsumerTest.Run(currentParams);
                         if (result > bestResult)
                         {
                             bestResult = result;
                             bestPoint = j;
                         }
                     }
-                    parameterInfo.MaxValue = bestPoint == pointCount ? parameterInfo.MaxValue : (int)(parameterInfo.MinValue + (bestPoint + 1) * diff);
-                    parameterInfo.MinValue = bestPoint == 0 ? parameterInfo.MinValue : (int)(parameterInfo.MinValue + (bestPoint-1) * diff);
-                    Log("ParameterInfos:\n  " + string.Join("\n  ", parameterInfos.Select(x => $"{x.Name} => {x.MinValue} .. {x.MaxValue}")));
+                    parameterInfo.MaxValue = bestPoint == pointCount
+                        ? parameterInfo.MaxValue
+                        : (int) (parameterInfo.MinValue + (bestPoint + 1) * diff);
+                    parameterInfo.MinValue = bestPoint == 0
+                        ? parameterInfo.MinValue
+                        : (int) (parameterInfo.MinValue + (bestPoint - 1) * diff);
+                    Log("ParameterInfos:\n  " + String.Join("\n  ",
+                            parameterInfos.Select(x => $"{x.Name} => {x.MinValue} .. {x.MaxValue}")));
                 }
             }
         }

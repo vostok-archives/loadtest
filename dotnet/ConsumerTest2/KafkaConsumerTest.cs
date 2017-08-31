@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using ConsumerTest2;
 using KafkaClient;
 
-namespace ConsumerTest
+namespace ConsumerTest2
 {
     public class KafkaConsumerTest
     {
@@ -36,7 +35,8 @@ namespace ConsumerTest
                 .SetBootstrapServers(new Uri(Program.KafkaUri))
                 .SetAcks(1)
                 .SetRetries(0)
-                //.SetCompression(CompressionCodes.none)
+                .SetCompression(CompressionCodes.none)
+                .Set("fetch.message.max.bytes",2000000)
                 .Set("auto.offset.reset", "latest")
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
@@ -45,10 +45,10 @@ namespace ConsumerTest
                 kafkaSetting.Set(parameter.Key, parameter.Value);
             }
 
-            KafkaQueueFiller.Run(parameters);
+            KafkaProducerTest.Run(parameters);
 
             var consumers = Enumerable.Range(1, 1)
-                .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, KafkaQueueFiller.Topic, new SimpleDesiralizer(),
+                .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, Program.Topic, new SimpleDesiralizer(),
                     new MessageObserver()))
                 .ToArray();
             var counter = 0;

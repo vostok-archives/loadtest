@@ -9,8 +9,9 @@ namespace KafkaLoadService.Core
 {
     public class KafkaLoadController : ControllerBase
     {
-        private const string TopicName = "topic-kload-dot-net";
+        private const string TopicName = "dot-net";
         private readonly KafkaProducer kafkaProducer;
+        private static readonly Random random = new Random();
 
         public KafkaLoadController()
         {
@@ -35,39 +36,30 @@ namespace KafkaLoadService.Core
         }
 
         [HttpGet]
-        public Task Load10Async() => LoadAsync(100, 10);
-        [HttpGet]
-        public Task Load100Async() => LoadAsync(100, 100);
-        [HttpGet]
-        public Task Load1000Async() => LoadAsync(100, 1000);
-        [HttpGet]
-        public Task GenerateAsync() => LoadAsync(100, 10, false);
+        public async Task Load10Async() => await LoadAsync(100, 10);
 
         [HttpGet]
-        public Task LoadAsync(int requestCount, int bodySize) => LoadAsync(requestCount, bodySize, true);
+        public async Task Load100Async() => await LoadAsync(100, 100);
+        [HttpGet]
+        public async Task Load1000Async() => await LoadAsync(100, 1000);
+        [HttpGet]
+        public async Task GenerateAsync() => await LoadAsync(100, 10, false);
+
+        [HttpGet]
+        public async Task LoadAsync(int requestCount, int bodySize) => await LoadAsync(requestCount, bodySize, true);
 
         private async Task LoadAsync(int requestCount, int bodySize, bool publishToKafka)
         {
-            var random = new Random();
-            var bodies = Enumerable.Range(0, requestCount)
-                .Select(i => GenerateBody(random, bodySize))
-                .ToArray();
             if (publishToKafka)
             {
-                foreach (var body in bodies)
+                for (var i = 0; i < requestCount; i++)
                 {
-                    kafkaProducer.Produce(TopicName, Guid.Empty, body);
+                    var body = new byte[bodySize];
+                    random.NextBytes(body);
+                    await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body);
                 }
             }
             MetricsReporter.Produced(requestCount, bodySize);
-        }
-
-        private static byte[] GenerateBody(Random random, int bodySize)
-        {
-            return Enumerable.Range(0, bodySize)
-                .Select(i => random.Next(256))
-                .Select(@int => (byte)@int)
-                .ToArray();
         }
 
         [HttpGet]

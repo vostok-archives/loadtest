@@ -4,15 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ConsumerTest;
 using KafkaClient;
 
 namespace ConsumerTest2
 {
-    public class KafkaQueueFiller
+    public class KafkaProducerTest
     {
         private const int stepMilliseconds = 500;
-        public const string Topic = "topic2";
         private static int requestCount;
         private static int successCount;
         private static int errorCount;
@@ -119,7 +117,7 @@ namespace ConsumerTest2
                 {
                     for (var i = 0; i < 100; i++)
                     {
-                        producer.Produce(Topic, Guid.NewGuid(), body);
+                        producer.Produce(Program.Topic, Guid.NewGuid(), body);
                     }
                 }
                 catch (Exception)

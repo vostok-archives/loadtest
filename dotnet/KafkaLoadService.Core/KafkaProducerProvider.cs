@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using KafkaClient;
 
@@ -6,11 +7,16 @@ namespace KafkaLoadService.Core
 {
     public static class KafkaProducerProvider
     {
-        private static KafkaProducer kafkaProducer;
+        private static readonly KafkaProducer kafkaProducer;
 
         static KafkaProducerProvider()
         {
             kafkaProducer = CreateKafkaProducer();
+        }
+
+        private static void OnMessageSent(byte[] bytes)
+        {
+            
         }
 
         private static KafkaProducer CreateKafkaProducer()
@@ -34,7 +40,7 @@ namespace KafkaLoadService.Core
                 .Set("socket.keepalive.enable", true)
                 .Set("socket.timeout.ms", 20)
                 .SetClientId("client-id");
-            return new KafkaProducer(kafkaSetting);
+            return new KafkaProducer(kafkaSetting, OnMessageSent);
         }
 
         public static KafkaProducer Get()
