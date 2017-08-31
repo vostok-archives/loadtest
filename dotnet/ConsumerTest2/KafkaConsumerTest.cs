@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Confluent.Kafka;
 using KafkaClient;
 
 namespace ConsumerTest2
@@ -11,7 +12,7 @@ namespace ConsumerTest2
     {
         public static int MessageCount;
 
-        private class MessageObserver : IObserver<byte[]>
+        private class MessageObserver : IObserver<Message<byte[],byte[]>>
         {
             public void OnCompleted()
             {
@@ -20,6 +21,11 @@ namespace ConsumerTest2
             public void OnError(Exception error)
             {
                 Console.WriteLine(error);
+            }
+
+            public void OnNext(Message<byte[], byte[]> value)
+            {
+                throw new NotImplementedException();
             }
 
             public void OnNext(byte[] value)
@@ -44,8 +50,6 @@ namespace ConsumerTest2
             {
                 kafkaSetting.Set(parameter.Key, parameter.Value);
             }
-
-            KafkaProducerTest.Run(parameters);
 
             var consumers = Enumerable.Range(1, 1)
                 .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, Program.Topic, new SimpleDesiralizer(),
