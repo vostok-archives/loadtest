@@ -21,11 +21,11 @@ namespace KafkaClient
         private readonly Consumer<byte[], T> consumer;
         private readonly CancellationTokenSource cancellationTokenSource;
 
-        public KafkaConsumer(KafkaSetting kafkaSetting, string topic, IDeserializer<T> deserializer, IObserver<T> observer)
+        public KafkaConsumer(KafkaSetting kafkaSetting, string topic, IDeserializer<T> deserializer, IObserver<Message<byte[], T>> observer)
         {
             var settings = kafkaSetting.ToDictionary();
             consumer = new Consumer<byte[], T>(settings, new SimpleDesiralizer(), deserializer);
-            consumer.OnMessage += (s, e) => observer.OnNext(e.Value);
+            consumer.OnMessage += (s, e) => observer.OnNext(e);
             consumer.OnError += (s, e) => observer.OnError(new Exception(e.Reason));
             consumer.OnConsumeError += (s, e) => observer.OnError(new Exception(e.Error.Reason));
             consumer.OnPartitionsAssigned += (s, e) =>
