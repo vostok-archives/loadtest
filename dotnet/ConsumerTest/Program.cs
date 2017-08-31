@@ -62,7 +62,7 @@ namespace ConsumerTest
                 .Set("fetch.wait.max.ms", 10);
 
 
-            return new KafkaConsumer<byte[]>(kafkaSetting, "dot-net", new DefaultDeserializer(), new CounterObserver<Message<byte[], byte[]>>());
+            return new KafkaConsumer<byte[]>(kafkaSetting, "dot-net", new DefaultDeserializer(), new MessageObserver());
         }
     }
 
