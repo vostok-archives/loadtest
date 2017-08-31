@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
 using KafkaClient;
 using Microsoft.Hadoop.Avro;
@@ -15,38 +15,54 @@ namespace ConsumerTest
         private const int StepMilliseconds = 500;
         static void Main(string[] args)
         {
-            var kafkaSetting = new KafkaSetting()
-                .SetBootstrapServers(new Uri("http://icat-test01:9092"))
-                .SetGroupId("test-group2")
-                .Set("auto.offset.reset", "latest")
-                .Set("auto.commit.interval.ms", 1000)
-                .Set("queued.max.messages.kbytes", 1000000000)
-                .Set("queued.min.messages", 10000000)
-                .Set("fetch.message.max.bytes", 10000000)
-                .Set("message.max.bytes", 1000000000)
-                .Set("message.copy.max.bytes", 1000000000)
-                .Set("receive.message.max.bytes", 1000000000)
-                .Set("max.in.flight.requests.per.connection", 1000000)
-                .Set("socket.send.buffer.bytes", 100000000)
-                .Set("socket.receive.buffer.bytes", 100000000)
-                .Set("queued.min.messages", 10000000)
-                .Set("fetch.min.bytes", 1)
-                .Set("queued.max.messages.kbytes", 1000000000)
-                .Set("fetch.wait.max.ms", 10000);
+            var kafkaConsumer = CreateKafkaConsumer();
 
-            var kafkaConsumer = new KafkaConsumer<TestKafkaModel>(kafkaSetting, "ktopic-with-ts", new AvroTestKafkaModelDeserializer(), new CounterObserver<TestKafkaModel>());
+            StartConsoleReprot();
 
+            kafkaConsumer.Dispose();
+        }
+
+        private static void StartConsoleReprot()
+        {
             var cancellationToken = new CancellationToken();
             while (!cancellationToken.IsCancellationRequested)
             {
                 Thread.Sleep(TimeSpan.FromMilliseconds(StepMilliseconds));
 
                 Console.WriteLine($"count: {MetricsReporter.TotalCount}, throughput: {MetricsReporter.LastThroughput}"
-                    + $", throughput MB: {(double) MetricsReporter.LastThroughputBytes / 1000 / 1000:0.00}"
-                    + $", mean travel time ms {MetricsReporter.LastMeanTravelTimeMs}");
+                                  + $", throughput MB: {(double) MetricsReporter.LastThroughputBytes / 1000 / 1000:0.00}"
+                                  + $", mean travel time ms {MetricsReporter.LastMeanTravelTimeMs}");
             }
+        }
 
-            kafkaConsumer.Dispose();
+        private static KafkaConsumer<byte[]> CreateKafkaConsumer()
+        {
+            var kafkaSetting = new KafkaSetting()
+                .SetGroupId("test-group2")
+                .SetBootstrapServers(new Uri("http://icat-test01:9092"))
+                .Set("auto.offset.reset", "latest")
+                .Set("auto.commit.interval.ms", 1000)
+                .Set("queued.max.messages.kbytes", 1000000000)
+                .Set("queued.min.messages", 10000000)
+                .Set("fetch.message.max.bytes", 80000)
+                .Set("internal.termination.signal", 10)
+                .Set("message.max.bytes", 1000000000)
+                .Set("message.copy.max.bytes", 1000000000)
+                .Set("receive.message.max.bytes", 1000000000)
+                .Set("max.in.flight.requests.per.connection", 1000)
+                .Set("socket.send.buffer.bytes", 100000000)
+                .Set("socket.receive.buffer.bytes", 100000000)
+                .Set("socket.blocking.max.ms", 20)
+                .Set("socket.send.buffer.bytes", 100000000)
+                .Set("queued.min.messages", 10000000)
+                .Set("fetch.min.bytes", 1)
+                .Set("queued.max.messages.kbytes", 1000000000)
+                .Set("topic.metadata.refresh.sparse", false)
+                .Set("fetch.error.backoff.ms", 20)
+                .Set("fetch.wait.max.ms", 10);
+
+
+            return new KafkaConsumer<byte[]>(kafkaSetting, "dot-net", new DefaultDeserializer(), new CounterObserver<Message<byte[], byte[]>>());
         }
     }
 
@@ -154,6 +170,23 @@ namespace ConsumerTest
         public void OnNext(TestKafkaModel value)
         {
             MetricsReporter.Add(1, value.Payload.Length, value.Timestamp);
+        }
+    }
+
+    public class MessageObserver : IObserver<Message<byte[], byte[]>>
+    {
+        public void OnCompleted()
+        { }
+
+        public void OnError(Exception error)
+        {
+            Console.WriteLine(error);
+        }
+
+        public void OnNext(Message<byte[], byte[]> value)
+        {
+            var timeSpan = DateTime.UtcNow - value.Timestamp.UtcDateTime;
+            MetricsReporter.Add(1, value.Value.Length, (long)timeSpan.TotalMilliseconds);
         }
     }
 

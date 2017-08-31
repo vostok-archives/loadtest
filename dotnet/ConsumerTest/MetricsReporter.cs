@@ -35,12 +35,13 @@ namespace ConsumerTest
             var cancellationToken = new CancellationTokenSource();
             while (!cancellationToken.IsCancellationRequested)
             {
-                GetValue(out var lastTotalCount, out var lastTotalSize, out var lastMeanTravelTimeMs);
+                GetValue(out var lastTotalCount, out var lastTotalSize, out var lastTotalTravelTimeMs);
                 Thread.Sleep(actualizePeriodInMillisecons);
-                GetValue(out var currentTotalCount, out var currentTotalSize, out var currentMeanTravelTimeMs);
+                GetValue(out var currentTotalCount, out var currentTotalSize, out var currentTotalTravelTimeMs);
+
                 LastThroughput = (long) CalculateThroughput(currentTotalCount, lastTotalCount, actualizePeriodInMillisecons);
                 LastThroughputBytes = (long) CalculateThroughput(currentTotalSize, lastTotalSize, actualizePeriodInMillisecons);
-                LastMeanTravelTimeMs = CalculateThroughput(currentMeanTravelTimeMs, lastMeanTravelTimeMs, actualizePeriodInMillisecons);
+                LastMeanTravelTimeMs = CalculateThroughput(currentTotalTravelTimeMs, lastTotalTravelTimeMs, actualizePeriodInMillisecons);
             }
         }
 
