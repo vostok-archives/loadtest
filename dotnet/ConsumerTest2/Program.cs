@@ -32,15 +32,16 @@ namespace ConsumerTest2
         static void Main(string[] args)
         {
             Log("kafka: " + KafkaUri);
+            Log("topic: " + Topic);
             //Util.ConfigureLog4Net();
             //Logger = LogManager.GetLogger(typeof(Program));
             //.Set("auto.commit.interval.ms", parameters["auto.commit.interval.ms"]) //1000
             //    .Set("session.timeout.ms", parameters["session.timeout.ms"]) //60000
             //    .Set("fetch.message.max.bytes", parameters["fetch.message.max.bytes"]) //52428800
             //    .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
-            KafkaProducerTest.Run(new Dictionary<string, int>());
-            KafkaConsumerTest.Run(new Dictionary<string, int>());
-            //ParamsOptimization();
+            //KafkaProducerTest.Run(new Dictionary<string, int>());
+            //KafkaConsumerTest.Run(new Dictionary<string, int>());
+            ParamsOptimization(KafkaProducerTest.Run);
         }
 
         private static void ParamsOptimization(Func<Dictionary<string,int>,double> func)
@@ -53,42 +54,42 @@ namespace ConsumerTest2
                 //    MinValue = 1000000,
                 //    MaxValue = 100000000
                 //}, 
+                //new ParameterInfo
+                //{
+                //    Name = "receive.message.max.bytes",
+                //    MinValue = 80000000,
+                //    MaxValue = 100000000
+                //},
 
                 new ParameterInfo
                 {
                     Name = "auto.commit.interval.ms",
-                    MinValue = 25000,
-                    MaxValue = 32800
+                    MinValue = 1000,
+                    MaxValue = 62800
                 },
                 new ParameterInfo
                 {
                     Name = "session.timeout.ms",
-                    MinValue = 35600,
+                    MinValue = 1600,
                     MaxValue = 43480
                 },
                 new ParameterInfo
                 {
                     Name = "message.max.bytes",
-                    MinValue = 8020000,
+                    MinValue = 10000,
                     MaxValue = 10000000
                 },
                 new ParameterInfo
                 {
                     Name = "message.copy.max.bytes",
-                    MinValue = 600000,
+                    MinValue = 10000,
                     MaxValue = 1000000
                 },
                 new ParameterInfo
                 {
-                    Name = "receive.message.max.bytes",
-                    MinValue = 80000000,
-                    MaxValue = 100000000
-                },
-                new ParameterInfo
-                {
                     Name = "max.in.flight.requests.per.connection",
-                    MinValue = 80000,
-                    MaxValue = 160000
+                    MinValue = 1000,
+                    MaxValue = 800000
                 },
                 new ParameterInfo
                 {
@@ -99,14 +100,14 @@ namespace ConsumerTest2
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.kbytes",
-                    MinValue = 1677920,
+                    MinValue = 1000,
                     MaxValue = 2097151
                 },
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.ms",
-                    MinValue = 5000,
-                    MaxValue = 10000
+                    MinValue = 1000,
+                    MaxValue = 100000
                 },
                 new ParameterInfo
                 {

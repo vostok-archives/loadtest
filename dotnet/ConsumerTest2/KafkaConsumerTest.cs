@@ -38,7 +38,7 @@ namespace ConsumerTest2
                 .SetRetries(0)
                 .SetCompression(CompressionCodes.none)
                 .Set("fetch.message.max.bytes",2000000)
-                .Set("auto.offset.reset", "latest")
+                //.Set("auto.offset.reset", "latest")
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
             foreach (var parameter in parameters)
@@ -47,8 +47,7 @@ namespace ConsumerTest2
             }
 
             var consumers = Enumerable.Range(1, 1)
-                .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, Program.Topic, new SimpleDesiralizer(),
-                    new MessageObserver()))
+                .Select(x => new KafkaConsumer<byte[]>(kafkaSetting, Program.Topic, new SimpleDesiralizer(),new MessageObserver()))
                 .ToArray();
             var counter = 0;
             const int stepMilliseconds = 1000;
