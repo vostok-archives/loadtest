@@ -37,7 +37,7 @@ namespace ConsumerTest2
                 .SetAcks(1)
                 .SetRetries(0)
                 .SetCompression(CompressionCodes.none)
-                .Set("fetch.message.max.bytes",2000000)
+                .Set("fetch.message.max.bytes",2000)
                 //.Set("auto.offset.reset", "latest")
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
