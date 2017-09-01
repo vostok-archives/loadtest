@@ -59,56 +59,57 @@ namespace ConsumerTest2
         {
             var parameterInfos = new[]
             {
-                //////// CONSUMER //////////////////////
-                ////new ParameterInfo
-                ////{
-                ////    Name = "queued.min.messages",
-                ////    MinValue = 10000,
-                ////    MaxValue = 10000000
-                ////},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "queued.max.messages.kbytes",
-                ////    MinValue = 10000,
-                ////    MaxValue = 10000000
-                ////},
+                ////// CONSUMER //////////////////////
                 //new ParameterInfo
                 //{
-                //    Name = "fetch.message.max.bytes",
-                //    MinValue = 10,
+                //    Name = "queued.min.messages",
+                //    MinValue = 10000,
+                //    MaxValue = 10000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "queued.max.messages.kbytes",
+                //    MinValue = 10000,
+                //    MaxValue = 10000000
+                //},
+                new ParameterInfo
+                {
+                    Name = "fetch.message.max.bytes",
+                    MinValue = 10,
+                    MaxValue = 10000
+                },
+                //new ParameterInfo
+                //{
+                //    Name = "fetch.wait.max.ms",
+                //    MinValue = 100,
                 //    MaxValue = 10000
                 //},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "fetch.wait.max.ms",
-                ////    MinValue = 100,
-                ////    MaxValue = 10000
-                ////},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "receive.message.max.bytes",
-                ////    MinValue = 100000,
-                ////    MaxValue = 100000000
-                ////},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "max.in.flight.requests.per.connection",
-                ////    MinValue = 1000,
-                ////    MaxValue = 800000
-                ////},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "session.timeout.ms",
-                ////    MinValue = 1600,
-                ////    MaxValue = 43480
-                ////},
-                ////new ParameterInfo
-                ////{
-                ////    Name = "batch.num.messages",
-                ////    MinValue = 1000,
-                ////    MaxValue = 1000000
-                ////},
+                //new ParameterInfo
+                //{
+                //    Name = "receive.message.max.bytes",
+                //    MinValue = 100000,
+                //    MaxValue = 100000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "max.in.flight.requests.per.connection",
+                //    MinValue = 1000,
+                //    MaxValue = 800000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "session.timeout.ms",
+                //    MinValue = 1600,
+                //    MaxValue = 43480
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "batch.num.messages",
+                //    MinValue = 1000,
+                //    MaxValue = 1000000
+                //},
 
+                /*
                 ////// PRODUCER ///////////////////
                 //new ParameterInfo
                 //{
@@ -164,6 +165,7 @@ namespace ConsumerTest2
                 //    MinValue = 1000,
                 //    MaxValue = 1000000
                 //},
+                */
             };
             LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "value" }));
             for (var i = 0; i < 10; i++)
