@@ -39,51 +39,45 @@ namespace ConsumerTest2
             //    .Set("session.timeout.ms", parameters["session.timeout.ms"]) //60000
             //    .Set("fetch.message.max.bytes", parameters["fetch.message.max.bytes"]) //52428800
             //    .Set("fetch.wait.max.ms", parameters["fetch.wait.max.ms"]) //500
-            //KafkaProducerTest.Run(new Dictionary<string, int>());
+            KafkaProducerTest.Run(new Dictionary<string, int>());
             //KafkaConsumerTest.Run(new Dictionary<string, int>());
-            ParamsOptimization(KafkaProducerTest.Run);
+            ParamsOptimization(KafkaConsumerTest.Run);
         }
 
         private static void ParamsOptimization(Func<Dictionary<string,int>,double> func)
         {
             var parameterInfos = new[]
             {
-                //new ParameterInfo()
-                //{
-                //    Name = "fetch.message.max.bytes",
-                //    MinValue = 1000000,
-                //    MaxValue = 100000000
-                //}, 
-                //new ParameterInfo
-                //{
-                //    Name = "receive.message.max.bytes",
-                //    MinValue = 80000000,
-                //    MaxValue = 100000000
-                //},
-
+                ////// CONSUMER //////////////////////
                 new ParameterInfo
                 {
-                    Name = "auto.commit.interval.ms",
-                    MinValue = 1000,
-                    MaxValue = 62800
-                },
-                new ParameterInfo
-                {
-                    Name = "session.timeout.ms",
-                    MinValue = 1600,
-                    MaxValue = 43480
-                },
-                new ParameterInfo
-                {
-                    Name = "message.max.bytes",
+                    Name = "queued.min.messages",
                     MinValue = 10000,
                     MaxValue = 10000000
                 },
                 new ParameterInfo
                 {
-                    Name = "message.copy.max.bytes",
+                    Name = "queued.max.messages.kbytes",
                     MinValue = 10000,
-                    MaxValue = 1000000
+                    MaxValue = 10000000
+                },
+                new ParameterInfo
+                {
+                    Name = "fetch.message.max.bytes",
+                    MinValue = 10000,
+                    MaxValue = 10000000
+                },
+                new ParameterInfo
+                {
+                    Name = "fetch.wait.max.ms",
+                    MinValue = 100,
+                    MaxValue = 10000
+                },
+                new ParameterInfo
+                {
+                    Name = "receive.message.max.bytes",
+                    MinValue = 10000,
+                    MaxValue = 100000000
                 },
                 new ParameterInfo
                 {
@@ -93,21 +87,9 @@ namespace ConsumerTest2
                 },
                 new ParameterInfo
                 {
-                    Name = "queue.buffering.max.messages",
-                    MinValue = 8002000,
-                    MaxValue = 10000000
-                },
-                new ParameterInfo
-                {
-                    Name = "queue.buffering.max.kbytes",
-                    MinValue = 1000,
-                    MaxValue = 2097151
-                },
-                new ParameterInfo
-                {
-                    Name = "queue.buffering.max.ms",
-                    MinValue = 1000,
-                    MaxValue = 100000
+                    Name = "session.timeout.ms",
+                    MinValue = 1600,
+                    MaxValue = 43480
                 },
                 new ParameterInfo
                 {
@@ -115,6 +97,62 @@ namespace ConsumerTest2
                     MinValue = 1000,
                     MaxValue = 1000000
                 },
+
+                //////// PRODUCER ///////////////////
+                //new ParameterInfo
+                //{
+                //    Name = "auto.commit.interval.ms",
+                //    MinValue = 1000,
+                //    MaxValue = 62800
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "session.timeout.ms",
+                //    MinValue = 1600,
+                //    MaxValue = 43480
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "message.max.bytes",
+                //    MinValue = 10000,
+                //    MaxValue = 10000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "message.copy.max.bytes",
+                //    MinValue = 10000,
+                //    MaxValue = 1000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "max.in.flight.requests.per.connection",
+                //    MinValue = 1000,
+                //    MaxValue = 800000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "queue.buffering.max.messages",
+                //    MinValue = 8002000,
+                //    MaxValue = 10000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "queue.buffering.max.kbytes",
+                //    MinValue = 1000,
+                //    MaxValue = 2097151
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "queue.buffering.max.ms",
+                //    MinValue = 1000,
+                //    MaxValue = 100000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "batch.num.messages",
+                //    MinValue = 1000,
+                //    MaxValue = 1000000
+                //},
             };
             for (var i = 0; i < 10; i++)
             {
