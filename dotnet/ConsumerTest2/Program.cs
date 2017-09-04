@@ -121,8 +121,8 @@ namespace ConsumerTest2
                 new ParameterInfo
                 {
                     Name = "_tasks",
-                    MinValue = 2,
-                    MaxValue = 100
+                    MinValue = 1,
+                    MaxValue = 10
                 },
                 new ParameterInfo
                 {
