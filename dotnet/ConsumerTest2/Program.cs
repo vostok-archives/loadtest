@@ -16,7 +16,7 @@ namespace ConsumerTest2
 
     public class Program
     {
-        public const int PointCount = 3;
+        public const int PointCount = 5;
         public static readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "http://localhost:9092" : "http://icat-test01:9092";
         public static string Topic = "dot-net1";
 
