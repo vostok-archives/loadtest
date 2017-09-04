@@ -122,7 +122,7 @@ namespace ConsumerTest2
                 {
                     Name = "auto.commit.interval.ms",
                     MinValue = 1000,
-                    MaxValue = 62800
+                    MaxValue = 10000
                 },
                 //new ParameterInfo
                 //{
@@ -166,12 +166,12 @@ namespace ConsumerTest2
                     MinValue = 10,
                     MaxValue = 10000
                 },
-                new ParameterInfo
-                {
-                    Name = "batch.num.messages",
-                    MinValue = 1000,
-                    MaxValue = 1000000
-                },
+                //new ParameterInfo
+                //{
+                //    Name = "batch.num.messages",
+                //    MinValue = 1000,
+                //    MaxValue = 1000000
+                //},
             };
             LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "value" }));
             for (var i = 0; i < 10; i++)
