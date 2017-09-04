@@ -66,88 +66,6 @@ namespace ConsumerTest2
         {
             var parameterInfos = new[]
             {
-                ////// CONSUMER //////////////////////
-                new ParameterInfo
-                {
-                    Name = "queued.min.messages",
-                    MinValue = 10000,
-                    MaxValue = 10000000
-                },
-                new ParameterInfo
-                {
-                    Name = "queued.max.messages.kbytes",
-                    MinValue = 10000,
-                    MaxValue = 10000000
-                },
-                new ParameterInfo
-                {
-                    Name = "fetch.message.max.bytes",
-                    MinValue = 10,
-                    MaxValue = 10000000
-                },
-                new ParameterInfo
-                {
-                    Name = "fetch.wait.max.ms",
-                    MinValue = 100,
-                    MaxValue = 10000
-                },
-                new ParameterInfo
-                {
-                    Name = "receive.message.max.bytes",
-                    MinValue = 100000,
-                    MaxValue = 100000000
-                },
-                new ParameterInfo
-                {
-                    Name = "max.in.flight.requests.per.connection",
-                    MinValue = 1000,
-                    MaxValue = 800000
-                },
-                new ParameterInfo
-                {
-                    Name = "session.timeout.ms",
-                    MinValue = 1600,
-                    MaxValue = 43480
-                },
-                //new ParameterInfo
-                //{
-                //    Name = "batch.num.messages",
-                //    MinValue = 1000,
-                //    MaxValue = 1000000
-                //},
-
-                
-                ////// PRODUCER ///////////////////
-                new ParameterInfo
-                {
-                    Name = "auto.commit.interval.ms",
-                    MinValue = 1000,
-                    MaxValue = 10000
-                },
-                //new ParameterInfo
-                //{
-                //    Name = "session.timeout.ms",
-                //    MinValue = 1600,
-                //    MaxValue = 43480
-                //},
-                new ParameterInfo
-                {
-                    Name = "message.max.bytes",
-                    MinValue = 10000,
-                    MaxValue = 10000000
-                },
-                //new ParameterInfo
-                //{
-                //    Name = "message.copy.max.bytes",
-                //    MinValue = 10000,
-                //    MaxValue = 1000000
-                //},
-                //new ParameterInfo
-                //{
-                //    Name = "max.in.flight.requests.per.connection",
-                //    MinValue = 1000,
-                //    MaxValue = 800000
-                //},
                 new ParameterInfo
                 {
                     Name = "queue.buffering.max.messages",
@@ -166,6 +84,89 @@ namespace ConsumerTest2
                     MinValue = 10,
                     MaxValue = 10000
                 },
+
+                ////// CONSUMER //////////////////////
+                new ParameterInfo
+                {
+                    Name = "queued.min.messages",
+                    MinValue = 10000000, //10000
+                    MaxValue = 10000000
+                },
+                new ParameterInfo
+                {
+                    Name = "queued.max.messages.kbytes",
+                    MinValue = 100000,
+                    MaxValue = 100000000
+                },
+                new ParameterInfo
+                {
+                    Name = "fetch.message.max.bytes",
+                    MinValue = 10,
+                    MaxValue = 100 //10000000
+                },
+                new ParameterInfo
+                {
+                    Name = "fetch.wait.max.ms",
+                    MinValue = 100,
+                    MaxValue = 10000
+                },
+                new ParameterInfo
+                {
+                    Name = "receive.message.max.bytes",
+                    MinValue = 5000000, //100000
+                    MaxValue = 100000000
+                },
+                new ParameterInfo
+                {
+                    Name = "max.in.flight.requests.per.connection",
+                    MinValue = 200000, //1000
+                    MaxValue = 800000
+                },
+                new ParameterInfo
+                {
+                    Name = "session.timeout.ms",
+                    MinValue = 3000, //1600
+                    MaxValue = 12000 //43480
+                },
+                //new ParameterInfo
+                //{
+                //    Name = "batch.num.messages",
+                //    MinValue = 1000,
+                //    MaxValue = 1000000
+                //},
+
+                
+                ////// PRODUCER ///////////////////
+                new ParameterInfo
+                {
+                    Name = "auto.commit.interval.ms",
+                    MinValue = 1000, //1000
+                    MaxValue = 5000 //10000
+                },
+                //new ParameterInfo
+                //{
+                //    Name = "session.timeout.ms",
+                //    MinValue = 1600,
+                //    MaxValue = 43480
+                //},
+                new ParameterInfo
+                {
+                    Name = "message.max.bytes",
+                    MinValue = 5000000, //10000
+                    MaxValue = 10000000
+                },
+                //new ParameterInfo
+                //{
+                //    Name = "message.copy.max.bytes",
+                //    MinValue = 10000,
+                //    MaxValue = 1000000
+                //},
+                //new ParameterInfo
+                //{
+                //    Name = "max.in.flight.requests.per.connection",
+                //    MinValue = 1000,
+                //    MaxValue = 800000
+                //},
                 //new ParameterInfo
                 //{
                 //    Name = "batch.num.messages",
@@ -202,8 +203,8 @@ namespace ConsumerTest2
                     }
                     var firstPoint = bestPoint == 0 ? 0 : bestPoint - 1;
                     var lastPoint = bestPoint == PointCount ? PointCount : bestPoint + 1;
-                    parameterInfo.MinValue = (int)(parameterInfo.MinValue + firstPoint * diff);
                     parameterInfo.MaxValue = (int)(parameterInfo.MinValue + lastPoint * diff);
+                    parameterInfo.MinValue = (int)(parameterInfo.MinValue + firstPoint * diff);
                     parameterInfo.Values[0] = results[firstPoint];
                     parameterInfo.Values[PointCount] = results[lastPoint];
                     Log("ParameterInfos:\n  " + string.Join("\n  ", parameterInfos.Select(x => $"{x.Name} => {x.MinValue} .. {x.MaxValue}")));
