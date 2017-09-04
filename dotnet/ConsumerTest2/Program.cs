@@ -57,8 +57,8 @@ namespace ConsumerTest2
             {
                 Topic = "dot-net" + Guid.NewGuid();
                 Log("topic: " + Topic);
-                KafkaProducerTest.Run(x);
-                return KafkaConsumerTest.Run(x);
+                return KafkaProducerTest.Run(x);
+                //return KafkaConsumerTest.Run(x);
             });
         }
 
@@ -66,27 +66,8 @@ namespace ConsumerTest2
         {
             var parameterInfos = new[]
             {
-                new ParameterInfo
-                {
-                    Name = "queue.buffering.max.messages",
-                    MinValue = 8002000,
-                    MaxValue = 10000000
-                },
-                new ParameterInfo
-                {
-                    Name = "queue.buffering.max.kbytes",
-                    MinValue = 1000,
-                    MaxValue = 2097151
-                },
-                new ParameterInfo
-                {
-                    Name = "queue.buffering.max.ms",
-                    MinValue = 10,
-                    MaxValue = 10000
-                },
-
                 ////// CONSUMER //////////////////////
-                new ParameterInfo
+/*                new ParameterInfo
                 {
                     Name = "queued.min.messages",
                     MinValue = 10000000, //10000
@@ -95,7 +76,7 @@ namespace ConsumerTest2
                 new ParameterInfo
                 {
                     Name = "queued.max.messages.kbytes",
-                    MinValue = 100000,
+                    MinValue = 100000, //10000
                     MaxValue = 100000000
                 },
                 new ParameterInfo
@@ -133,46 +114,65 @@ namespace ConsumerTest2
                 //    Name = "batch.num.messages",
                 //    MinValue = 1000,
                 //    MaxValue = 1000000
-                //},
+                //},*/
 
                 
                 ////// PRODUCER ///////////////////
+                new ParameterInfo
+                {
+                    Name = "queue.buffering.max.messages",
+                    MinValue = 8002000,
+                    MaxValue = 10000000
+                },
+                new ParameterInfo
+                {
+                    Name = "queue.buffering.max.kbytes",
+                    MinValue = 1000,
+                    MaxValue = 2097151
+                },
+                new ParameterInfo
+                {
+                    Name = "queue.buffering.max.ms",
+                    MinValue = 10,
+                    MaxValue = 10000
+                },
+
                 new ParameterInfo
                 {
                     Name = "auto.commit.interval.ms",
                     MinValue = 1000, //1000
                     MaxValue = 5000 //10000
                 },
-                //new ParameterInfo
-                //{
-                //    Name = "session.timeout.ms",
-                //    MinValue = 1600,
-                //    MaxValue = 43480
-                //},
                 new ParameterInfo
                 {
                     Name = "message.max.bytes",
                     MinValue = 5000000, //10000
                     MaxValue = 10000000
                 },
-                //new ParameterInfo
-                //{
-                //    Name = "message.copy.max.bytes",
-                //    MinValue = 10000,
-                //    MaxValue = 1000000
-                //},
-                //new ParameterInfo
-                //{
-                //    Name = "max.in.flight.requests.per.connection",
-                //    MinValue = 1000,
-                //    MaxValue = 800000
-                //},
-                //new ParameterInfo
-                //{
-                //    Name = "batch.num.messages",
-                //    MinValue = 1000,
-                //    MaxValue = 1000000
-                //},
+                new ParameterInfo
+                {
+                    Name = "message.copy.max.bytes",
+                    MinValue = 10000,
+                    MaxValue = 1000000
+                },
+                new ParameterInfo
+                {
+                    Name = "batch.num.messages",
+                    MinValue = 1000,
+                    MaxValue = 1000000
+                },
+                new ParameterInfo
+                {
+                    Name = "max.in.flight.requests.per.connection",
+                    MinValue = 200000, //1000
+                    MaxValue = 800000
+                },
+                new ParameterInfo
+                {
+                    Name = "session.timeout.ms",
+                    MinValue = 3000, //1600
+                    MaxValue = 12000 //43480
+                },
             };
             LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "value" }));
             for (var i = 0; i < 10; i++)

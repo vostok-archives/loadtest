@@ -79,7 +79,7 @@ namespace ConsumerTest2
 
                     for (var i = 0; i < 1; i++)
                     {
-                        for (var j = 0; j < 2; j++)
+                        for (var j = 0; j < 10; j++)
                         {
                             var task = new Task(() =>
                             {
