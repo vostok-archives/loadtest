@@ -42,7 +42,7 @@ namespace ConsumerTest2
                 //.Set("batch.num.messages", 500500)
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
-            foreach (var parameter in parameters)
+            foreach (var parameter in parameters.Where(x => !x.Key.StartsWith("_")))
             {
                 kafkaSetting.Set(parameter.Key, parameter.Value);
             }
@@ -79,7 +79,7 @@ namespace ConsumerTest2
 
                     for (var i = 0; i < 1; i++)
                     {
-                        for (var j = 0; j < 10; j++)
+                        for (var j = 0; j < parameters["_tasks"]; j++)
                         {
                             var task = new Task(() =>
                             {
@@ -115,7 +115,7 @@ namespace ConsumerTest2
                 Interlocked.Increment(ref requestCount);
                 try
                 {
-                    for (var i = 0; i < 100; i++)
+                    for (var i = 0; i < 1000; i++)
                     {
                         producer.Produce(Program.Topic, Guid.NewGuid(), body);
                     }
