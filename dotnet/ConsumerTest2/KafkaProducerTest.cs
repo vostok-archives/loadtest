@@ -89,7 +89,7 @@ namespace ConsumerTest2
                             tasks.Add(task);
                         }
                     }
-                    Thread.Sleep(10000);
+                    Thread.Sleep(60000);
                     cancellationTokenSource.Cancel();
                     Task.WaitAll(tasks.ToArray());
                 }

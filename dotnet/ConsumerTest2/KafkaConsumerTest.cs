@@ -67,7 +67,7 @@ namespace ConsumerTest2
                 }
                 //Console.WriteLine(DiffTimestampManager.GetReport());
                 Program.Log($"MessageCount={newCount}, perSecond={rps}, avg={avgRps}");
-                if (stopwatch.ElapsedMilliseconds > 60000) //Math.Abs(rps) < 1 && newCount > 0 ||
+                if (Math.Abs(rps) < 1 && newCount > 0 || stopwatch.ElapsedMilliseconds > 60000) //
                     break;
             }
             foreach (var consumer in consumers)
