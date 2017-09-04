@@ -121,8 +121,8 @@ namespace ConsumerTest2
                 new ParameterInfo
                 {
                     Name = "_tasks",
-                    MinValue = 1,
-                    MaxValue = 10
+                    MinValue = 2,
+                    MaxValue = 2
                 },
                 new ParameterInfo
                 {
@@ -183,7 +183,7 @@ namespace ConsumerTest2
             LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "value" }));
             for (var i = 0; i < 10; i++)
             {
-                foreach (var parameterInfo in parameterInfos)
+                foreach (var parameterInfo in parameterInfos.Where(x => x.MaxValue - x.MinValue > 3))
                 {
                     var currentParams = parameterInfos.ToDictionary(x => x.Name, x => (x.MaxValue + x.MinValue) / 2);
                     double bestResult = 0;
