@@ -38,7 +38,7 @@ namespace ConsumerTest2
                 //.Set("max.in.flight.requests.per.connection", 128000)
                 //.Set("queue.buffering.max.messages", 9001000)
                 //.Set("queue.buffering.max.kbytes", 1887535)
-                .Set("queue.buffering.max.ms", 20)
+                //.Set("queue.buffering.max.ms", 20)
                 //.Set("batch.num.messages", 500500)
                 .SetClientId("client-id")
                 .SetGroupId("test-group");
