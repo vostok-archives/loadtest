@@ -37,16 +37,23 @@ namespace KafkaLoadService.Core
 
         [HttpGet]
         public async Task Load10Async() => await LoadAsync(100, 10);
-
+        [HttpGet]
+        public void Load10() => Load(100, 10);
         [HttpGet]
         public async Task Load100Async() => await LoadAsync(100, 100);
         [HttpGet]
+        public void Load100() => Load(100, 100);
+        [HttpGet]
         public async Task Load1000Async() => await LoadAsync(100, 1000);
+        [HttpGet]
+        public void Load1000() => Load(100, 1000);
         [HttpGet]
         public async Task GenerateAsync() => await LoadAsync(100, 10, false);
 
         [HttpGet]
         public async Task LoadAsync(int requestCount, int bodySize) => await LoadAsync(requestCount, bodySize, true);
+        [HttpGet]
+        public void Load(int requestCount, int bodySize) => Load(requestCount, bodySize, true);
 
         private async Task LoadAsync(int requestCount, int bodySize, bool publishToKafka)
         {
@@ -60,6 +67,18 @@ namespace KafkaLoadService.Core
                 }
             }
             MetricsReporter.Produced(requestCount, bodySize);
+        }
+        private void Load(int requestCount, int bodySize, bool publishToKafka)
+        {
+            if (publishToKafka)
+            {
+                for (var i = 0; i < requestCount; i++)
+                {
+                    var body = new byte[bodySize];
+                    random.NextBytes(body);
+                    kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
+                }
+            }
         }
 
         [HttpGet]

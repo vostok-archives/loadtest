@@ -26,10 +26,17 @@ namespace KafkaLoadService.Core
             routeBuilder.AddRoute<PingController>("noop", c => c.PingNoop());
             routeBuilder.AddRoute<PingController>("error", c => c.Error());
             routeBuilder.AddRoute<KafkaLoadController>("kload/timer", c => c.LoadWithTimerAsync(0, 0));
+
             routeBuilder.AddRoute<KafkaLoadController>("kload", c => c.LoadAsync(0, 0));
             routeBuilder.AddRoute<KafkaLoadController>("kload10", c => c.Load10Async());
             routeBuilder.AddRoute<KafkaLoadController>("kload100", c => c.Load100Async());
             routeBuilder.AddRoute<KafkaLoadController>("kload1000", c => c.Load1000Async());
+
+            routeBuilder.AddRoute<KafkaLoadController>("skload", c => c.Load(0, 0));
+            routeBuilder.AddRoute<KafkaLoadController>("skload10", c => c.Load10());
+            routeBuilder.AddRoute<KafkaLoadController>("skload100", c => c.Load100());
+            routeBuilder.AddRoute<KafkaLoadController>("skload1000", c => c.Load1000());
+
             routeBuilder.AddRoute<KafkaLoadController>("gen", c => c.GenerateAsync());
             routeBuilder.AddRoute<MetricsReportController>("th", c => c.GetLastThroghput());
             routeBuilder.AddRoute<MetricsReportController>("thmb", c => c.GetLastThroghputMb());

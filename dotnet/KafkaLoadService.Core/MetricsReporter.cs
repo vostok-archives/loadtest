@@ -19,11 +19,13 @@ namespace KafkaLoadService.Core
 
         public static void Produced(int count, int size)
         {
-            lock (lockObject)
-            {
-                totalCount += count;
-                totalSize += count * size;
-            }
+            Interlocked.Add(ref totalCount, count);
+            Interlocked.Add(ref totalSize, count * size);
+            //lock (lockObject)
+            //{
+            //    totalCount += count;
+            //    totalSize += count * size;
+            //}
         }
 
         public static void ActualizeThrougput()
@@ -47,11 +49,11 @@ namespace KafkaLoadService.Core
 
         private static void GetValue(out long lastTotalCount, out long lastTotalSize)
         {
-            lock (lockObject)
-            {
+            //lock (lockObject)
+            //{
                 lastTotalCount = totalCount;
                 lastTotalSize = totalSize;
-            }
+            //}
         }
     }
 }

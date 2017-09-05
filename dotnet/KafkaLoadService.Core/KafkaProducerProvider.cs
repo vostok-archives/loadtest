@@ -16,7 +16,7 @@ namespace KafkaLoadService.Core
 
         private static void OnMessageSent(byte[] bytes)
         {
-            
+            MetricsReporter.Produced(1, bytes.Length);
         }
 
         private static KafkaProducer CreateKafkaProducer()
