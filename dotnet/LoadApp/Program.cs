@@ -45,11 +45,11 @@ namespace LoadApp
 
             for (var i = 0; i < 10; i++)
             {
-                for (var j = 0; j < 1; j++)
+                for (var j = 0; j < 5; j++)
                 {
-                    var task = new Task(() =>
+                    var task = new Task(async () =>
                     {
-                        SendingLoop(httpClient, cancellationToken);
+                        await SendingLoop(httpClient, cancellationToken);
                     }, cancellationToken);
                     task.Start();
                     tasks.Add(task);
@@ -61,17 +61,25 @@ namespace LoadApp
             Console.WriteLine($"success = {successCount}, all = {requestCount}");
         }
 
-        private static void SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
+        private static async Task SendingLoop(HttpClient httpClient, CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 Interlocked.Increment(ref requestCount);
-                var httpResponseMessage = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10"))
-                    .Result;
-                if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
-                    Interlocked.Increment(ref successCount);
-                else
+                try
+                {
+                    var httpResponseMessage = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "kload10"));
+                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                        Interlocked.Increment(ref successCount);
+                    else
+                        Interlocked.Increment(ref errorCount);
+
+                }
+                catch (Exception e)
+                {
+                    //Console.WriteLine(e);
                     Interlocked.Increment(ref errorCount);
+                }
             }
         }
     }
