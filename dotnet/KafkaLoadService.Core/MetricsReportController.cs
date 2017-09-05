@@ -13,7 +13,7 @@ namespace KafkaLoadService.Core
         [HttpGet]
         public string GetLastThroghputMb()
         {
-            var lastThroghputMb = (double)MetricsReporter.LastThroughputBytes / 1000 / 1000;
+            var lastThroghputMb = (double)MetricsReporter.LastThroughputBytes / 1024 / 1024;
             return $"{lastThroghputMb:0.00}";
         }
     }

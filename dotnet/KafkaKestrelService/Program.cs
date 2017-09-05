@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using KafkaClient;
 using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -48,7 +49,7 @@ namespace KafkaProducerService
                 .SetGroupId("test-group");
         }
 
-        public static KafkaProducer Get(Action<byte[]> receiveMessageAction = null)
+        public static KafkaProducer Get(Action<Message> receiveMessageAction = null)
         {
             return new KafkaProducer(kafkaSetting, receiveMessageAction);
         }

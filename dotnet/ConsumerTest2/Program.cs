@@ -152,8 +152,8 @@ namespace ConsumerTest2
                 new ParameterInfo
                 {
                     Name = "message.max.bytes",
-                    MinValue = 5000000, //10000
-                    MaxValue = 100000000
+                    MinValue = 10000, //10000
+                    MaxValue = 1000000
                 },
                 //new ParameterInfo
                 //{

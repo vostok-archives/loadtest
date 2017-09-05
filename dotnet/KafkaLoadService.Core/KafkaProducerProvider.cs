@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Confluent.Kafka;
 using KafkaClient;
 
 namespace KafkaLoadService.Core
@@ -14,9 +15,15 @@ namespace KafkaLoadService.Core
             kafkaProducer = CreateKafkaProducer();
         }
 
-        private static void OnMessageSent(byte[] bytes)
+        private static void OnMessageSent(Message message)
         {
-            MetricsReporter.Produced(1, bytes.Length);
+            if (!message.Error.HasError)
+                MetricsReporter.Produced(1, message.Value.Length);
+            else
+            {
+                MetricsReporter.Error(1);
+                Console.WriteLine(message.Error.Reason);
+            }
         }
 
         private static KafkaProducer CreateKafkaProducer()
@@ -30,13 +37,13 @@ namespace KafkaLoadService.Core
                 //.Set("queue.buffering.max.ms", 20)
                 .Set("auto.commit.interval.ms", 1400)
                 .Set("session.timeout.ms", 8400)
-                .Set("message.max.bytes", 9500000)
+                .Set("message.max.bytes", 100000)
                 .Set("message.copy.max.bytes", 604000)
                 //.Set("receive.message.max.bytes", 92000000)
                 .Set("max.in.flight.requests.per.connection", 560000)
                 .Set("queue.buffering.max.messages", 9200800)
                 .Set("queue.buffering.max.kbytes", 839460)
-                .Set("queue.buffering.max.ms", 7500)
+                .Set("queue.buffering.max.ms", 500)
                 .Set("batch.num.messages", 1000000)
                 .SetClientId("client-id");
             return new KafkaProducer(kafkaSetting, OnMessageSent);

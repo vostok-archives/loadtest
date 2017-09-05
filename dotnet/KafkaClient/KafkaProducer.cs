@@ -6,19 +6,17 @@ namespace KafkaClient
 {
     public class KafkaProducer : IDisposable
     {
-        private readonly Action<byte[]> receiveMessageAction;
-
         private class DeliveryHandler : IDeliveryHandler
         {
-            private readonly Action<byte[]> messageAction;
+            private readonly Action<Message> messageAction;
 
-            public DeliveryHandler(Action<byte[]> messageAction)
+            public DeliveryHandler(Action<Message> messageAction)
             {
                 this.messageAction = messageAction;
             }
             public void HandleDeliveryReport(Message message)
             {
-                messageAction(message.Value);
+                messageAction(message);
             }
 
             public bool MarshalData
@@ -29,15 +27,14 @@ namespace KafkaClient
 
         private readonly Producer producer;
         private readonly bool disableDeliveryReports;
-        private readonly DeliveryHandler deliveryHandler = null;
+        private readonly DeliveryHandler deliveryHandler;
 
-        public KafkaProducer(KafkaSetting kafkaSetting, Action<byte[]> receiveMessageAction = null)
+        public KafkaProducer(KafkaSetting kafkaSetting, Action<Message> receiveMessageAction = null)
         {
             if (receiveMessageAction != null)
             {
                 deliveryHandler = new DeliveryHandler(receiveMessageAction);
             }
-            this.receiveMessageAction = receiveMessageAction;
             var settings = kafkaSetting.ToDictionary();
             disableDeliveryReports = kafkaSetting.DisableDeliveryReports;
             producer = new Producer(settings, false, disableDeliveryReports);
@@ -45,7 +42,7 @@ namespace KafkaClient
 
         public void Produce(string topic, Guid key, byte[] value)
         {
-            if (receiveMessageAction != null)
+            if (deliveryHandler != null)
                 producer.ProduceAsync(topic, key.ToByteArray(), value, deliveryHandler);
             else
                 ProduceAsync(topic, key, value).GetAwaiter().GetResult();

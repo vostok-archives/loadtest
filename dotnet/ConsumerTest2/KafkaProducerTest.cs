@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using KafkaClient;
 
 namespace ConsumerTest2
@@ -15,9 +16,12 @@ namespace ConsumerTest2
         private static int successCount;
         private static int errorCount;
 
-        private static void OnMessageDelivered(byte[] data)
+        private static void OnMessageDelivered(Message message)
         {
-            Interlocked.Increment(ref successCount);
+            if (message.Error.HasError)
+                Interlocked.Increment(ref errorCount);
+            else
+                Interlocked.Increment(ref successCount);
         }
 
         public static double Run(Dictionary<string, int> parameters)
