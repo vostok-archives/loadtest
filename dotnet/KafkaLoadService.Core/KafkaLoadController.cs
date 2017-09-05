@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using KafkaClient;
 using Microsoft.AspNetCore.Mvc;
@@ -59,12 +59,14 @@ namespace KafkaLoadService.Core
         {
             if (publishToKafka)
             {
+                var tasks = new List<Task>();
                 for (var i = 0; i < requestCount; i++)
                 {
                     var body = new byte[bodySize];
                     random.NextBytes(body);
-                    await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body);
+                    tasks.Add(kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body));
                 }
+                await Task.WhenAll(tasks.ToArray());
             }
             MetricsReporter.Produced(requestCount, bodySize);
         }
