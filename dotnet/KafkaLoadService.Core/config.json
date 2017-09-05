@@ -1,9 +1,10 @@
 ﻿{
-    "settings": {
-        "ServicePort": "8888",
-        "DisableKafkaReports": true
-    },
-    "topology": {
+  "settings": {
+    "ServicePort": "8888",
+    "DisableKafkaReports": false,
+    "MergeMessages": false
+  },
+  "topology": {
         "Kafka": ["http://icat-test01:9092"]
-    }
+  }
 }

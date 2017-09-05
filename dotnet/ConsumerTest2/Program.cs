@@ -180,7 +180,7 @@ namespace ConsumerTest2
                 //    MaxValue = 12000 //43480
                 //},
             };
-            LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "value" }));
+            LogStat(parameterInfos.Select(x => x.Name).Concat(new [] { "RPS" }));
             for (var i = 0; i < 10; i++)
             {
                 foreach (var parameterInfo in parameterInfos.Where(x => x.MaxValue - x.MinValue > 3))
@@ -205,7 +205,7 @@ namespace ConsumerTest2
                             bestPoint = j;
                         }
                         parameterInfo.Values[j] = 0;
-                        LogStat(parameterInfos.Select(x => currentParams[x.Name].ToString()).Concat(new[] { result.ToString(CultureInfo.InvariantCulture) }));
+                        LogStat(parameterInfos.Select(x => currentParams[x.Name].ToString()).Concat(new[] { ((long)result).ToString(CultureInfo.InvariantCulture) }));
                     }
                     var firstPoint = bestPoint == 0 ? 0 : bestPoint - 1;
                     var lastPoint = bestPoint == PointCount ? PointCount : bestPoint + 1;

@@ -59,14 +59,23 @@ namespace KafkaLoadService.Core
         {
             if (publishToKafka)
             {
-                var tasks = new List<Task>();
-                for (var i = 0; i < requestCount; i++)
+                if (SettingsProvider.GetSettings().MergeMessages)
                 {
-                    var body = new byte[bodySize];
+                    var body = new byte[bodySize * requestCount];
                     random.NextBytes(body);
-                    tasks.Add(kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body));
+                    await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body);
                 }
-                await Task.WhenAll(tasks.ToArray());
+                else
+                {
+                    var tasks = new List<Task>();
+                    for (var i = 0; i < requestCount; i++)
+                    {
+                        var body = new byte[bodySize];
+                        random.NextBytes(body);
+                        tasks.Add(kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body));
+                    }
+                    await Task.WhenAll(tasks.ToArray());
+                }
             }
             MetricsReporter.Produced(requestCount, bodySize);
         }
@@ -74,11 +83,20 @@ namespace KafkaLoadService.Core
         {
             if (publishToKafka)
             {
-                for (var i = 0; i < requestCount; i++)
+                if (SettingsProvider.GetSettings().MergeMessages)
                 {
-                    var body = new byte[bodySize];
+                    var body = new byte[bodySize * requestCount];
                     random.NextBytes(body);
                     kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
+                }
+                else
+                {
+                    for (var i = 0; i < requestCount; i++)
+                    {
+                        var body = new byte[bodySize];
+                        random.NextBytes(body);
+                        kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
+                    }
                 }
             }
         }

@@ -37,7 +37,7 @@ namespace KafkaLoadService.Core
                 //.Set("queue.buffering.max.ms", 20)
                 .Set("auto.commit.interval.ms", 1400)
                 .Set("session.timeout.ms", 8400)
-                .Set("message.max.bytes", 100000)
+                .Set("message.max.bytes", 1000000)
                 .Set("message.copy.max.bytes", 604000)
                 //.Set("receive.message.max.bytes", 92000000)
                 .Set("max.in.flight.requests.per.connection", 560000)
