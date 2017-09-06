@@ -17,7 +17,7 @@ namespace ConsumerTest2
     public class Program
     {
         public const int PointCount = 5;
-        public static readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "http://localhost:9092" : "http://icat-test01:9092";
+        public static readonly string KafkaUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !Environment.MachineName.StartsWith("icat", StringComparison.InvariantCultureIgnoreCase) ? "http://localhost:9092" : "http://icat-test01:9092";
         public static string Topic = "dot-net1";
 
         private static readonly object lockObject = new object();

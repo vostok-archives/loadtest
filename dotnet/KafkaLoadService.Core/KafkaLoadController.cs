@@ -4,18 +4,25 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using KafkaClient;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace KafkaLoadService.Core
 {
     public class KafkaLoadController : ControllerBase
     {
-        private const string TopicName = "dot-net";
+        private const string TopicName = "dot-net-next";
         private readonly KafkaProducer kafkaProducer;
         private static readonly Random random = new Random();
+        private static readonly byte[] bigRandomBuffer = new byte[short.MaxValue*100 - 5];
 
         public KafkaLoadController()
         {
             kafkaProducer = KafkaProducerProvider.Get();
+        }
+
+        static KafkaLoadController()
+        {
+            random.NextBytes(bigRandomBuffer);
         }
 
         [HttpGet]
@@ -61,8 +68,7 @@ namespace KafkaLoadService.Core
             {
                 if (SettingsProvider.GetSettings().MergeMessages)
                 {
-                    var body = new byte[bodySize * requestCount];
-                    random.NextBytes(body);
+                    var body = GetRandomBody(bodySize * requestCount);
                     await kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body);
                 }
                 else
@@ -70,7 +76,7 @@ namespace KafkaLoadService.Core
                     var tasks = new List<Task>();
                     for (var i = 0; i < requestCount; i++)
                     {
-                        var body = new byte[bodySize];
+                        var body = GetRandomBody(bodySize);
                         random.NextBytes(body);
                         tasks.Add(kafkaProducer.ProduceAsync(TopicName, Guid.NewGuid(), body));
                     }
@@ -79,21 +85,29 @@ namespace KafkaLoadService.Core
             }
             MetricsReporter.Produced(requestCount, bodySize);
         }
+
+        private static byte[] GetRandomBody(int size)
+        {
+            var body = new byte[size];
+            var offset = random.Next(bigRandomBuffer.Length - size);
+            Array.Copy(bigRandomBuffer, offset, body, 0, size);
+            return body;
+        }
+
         private void Load(int requestCount, int bodySize, bool publishToKafka)
         {
             if (publishToKafka)
             {
                 if (SettingsProvider.GetSettings().MergeMessages)
                 {
-                    var body = new byte[bodySize * requestCount];
-                    random.NextBytes(body);
+                    var body = GetRandomBody(bodySize * requestCount);
                     kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
                 }
                 else
                 {
                     for (var i = 0; i < requestCount; i++)
                     {
-                        var body = new byte[bodySize];
+                        var body = GetRandomBody(bodySize);
                         random.NextBytes(body);
                         kafkaProducer.Produce(TopicName, Guid.NewGuid(), body);
                     }
