@@ -1,16 +1,49 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AirlockAmmoGenerator
 {
     public class CompositeAmmoGenerator : IAmmoGenerator
     {
-        public CompositeAmmoGenerator(IAmmoGeneratorRegistry generatorRegistry, params AmmoType[] ammoTypes)
+        private readonly IDictionary<AmmoType, IAmmoGenerator> _generatorRegistry;
+        private readonly AmmoType[] _ammoTypes;
+
+        public CompositeAmmoGenerator(IDictionary<AmmoType, IAmmoGenerator> generatorRegistry, params AmmoType[] ammoTypes)
         {
+            _generatorRegistry = generatorRegistry;
+            _ammoTypes = ammoTypes;
         }
 
-        public IEnumerable<Ammo> Generate()
+        public IEnumerable<Ammo> Generate(int count)
         {
-            throw new System.NotImplementedException();
+            int remainingCount = count;
+            int step = Math.Max(count / _ammoTypes.Length, 1);
+            
+            var result = new List<Ammo>(count);
+            foreach (var ammoType in _ammoTypes)
+            {
+                result.AddRange(_generatorRegistry[ammoType].Generate(step));
+                remainingCount -= step;
+            }
+
+            if (remainingCount > 0)
+                result.AddRange(_generatorRegistry.First().Value.Generate(remainingCount));
+
+            Shuffle(result);
+            return result;
+        }
+
+        private void Shuffle(List<Ammo> result)
+        {
+            var random = new Random();
+            for (int pos = 0; pos < result.Count; pos++)
+            {
+                var newPos = random.Next(pos, result.Count);
+                var tmp = result[pos];
+                result[pos] = result[newPos];
+                result[newPos] = tmp;
+            }
         }
     }
 }

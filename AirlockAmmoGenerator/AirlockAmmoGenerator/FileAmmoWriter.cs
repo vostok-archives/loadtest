@@ -17,7 +17,7 @@ namespace AirlockAmmoGenerator
 
         public async Task WriteAsync(IEnumerable<Ammo> ammos)
         {
-            using (var file = File.OpenWrite(_path))
+            using (var file = File.Create(_path))
             {
                 foreach (var ammo in ammos)
                     await WriteAmmo(file, ammo);
@@ -27,7 +27,7 @@ namespace AirlockAmmoGenerator
         private async Task WriteAmmo(FileStream file, Ammo ammo)
         {
             var bytes = AmmoToBytes(ammo);
-            var ammoLength = Encoding.ASCII.GetBytes($"{bytes.Length}\r\n");
+            var ammoLength = Encoding.ASCII.GetBytes($"{bytes.Length} gate\r\n");
             await file.WriteAsync(ammoLength, 0, ammoLength.Length);
             await file.WriteAsync(bytes, 0, bytes.Length);
         }
@@ -38,11 +38,12 @@ namespace AirlockAmmoGenerator
             {
                 using (var writer = new StreamWriter(stream, Encoding.ASCII, 1024, true))
                 {
-                    writer.Write($"POST {ammo.Target.PathAndQuery} HTTP/1.0\r\n");
+                    writer.Write($"POST {ammo.Target.PathAndQuery} HTTP/1.1\r\n");
                     foreach (var header in ammo.Headers)
                         writer.Write($"{header.Key}: {header.Value}\r\n");
                     writer.Write("\r\n");
                 }
+                Console.WriteLine(ammo.Body[0]);
                 stream.Write(ammo.Body, 0, ammo.Body.Length);
                 return stream.ToArray();
             }

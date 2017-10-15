@@ -2,8 +2,8 @@
 
 namespace AirlockAmmoGenerator
 {
-    public interface IAmmoGenerator
+    public interface IAirlockEventGenerator
     {
-        IEnumerable<Ammo> Generate(int count);
+        IEnumerable<byte[]> Generate();
     }
 }
