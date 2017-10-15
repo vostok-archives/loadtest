@@ -1,4 +1,6 @@
-﻿namespace AirlockAmmoGenerator
+﻿using AirlockAmmoGenerator.Generation;
+
+namespace AirlockAmmoGenerator
 {
     public class Options
     {
@@ -6,10 +8,6 @@
 
         public int Count { get; set; }
 
-        //public bool GenerateLogAmmo { get; set; }
-        //public bool GenerateMetricsAmmo { get; set; }
-        //public bool GenerateMetricsAggregatorAmmo { get; set; }
-        //public bool GenerateTracingAmmo { get; set; }
         public AmmoType[] AmmoTypes
         {
             get => _ammoTypes;
@@ -17,8 +15,11 @@
         }
 
         public string Output { get; set; }
+
         public string Host { get; set; }
+
         public int Port { get; set; }
+
         public string ApiKey { get; set; }
     }
 }

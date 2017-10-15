@@ -3,7 +3,7 @@ using System.IO;
 using Vostok.Airlock;
 using Vostok.Commons.Binary;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Gate
 {
     public class SimpleAirlockSink : IAirlockSink, IDisposable
     {

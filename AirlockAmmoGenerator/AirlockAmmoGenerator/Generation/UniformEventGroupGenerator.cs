@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AirlockAmmoGenerator.Gate;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public class UniformEventGroupGenerator : IEventGroupGenerator
     {
@@ -19,7 +20,7 @@ namespace AirlockAmmoGenerator
         {
             for (int i = 0; i < count; i++)
             {
-                var records = _eventGenerator.Generate().Select(EventRecordHelper.WithBody).Take(GroupSize).ToList();
+                var records = Enumerable.Take<EventRecord>(_eventGenerator.Generate().Select(EventRecordHelper.WithBody), GroupSize).ToList();
                 yield return new EventGroup
                 {
                     RoutingKey = _routingKey,

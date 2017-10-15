@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AirlockAmmoGenerator.Generation;
+using AirlockAmmoGenerator.Special;
 
 namespace AirlockAmmoGenerator
 {
@@ -18,7 +20,7 @@ namespace AirlockAmmoGenerator
             };
             // todo: parse options
 
-            var logAmmoGenerator = new AirlockAmmoGenerator(options.Host, options.Port, options.ApiKey,
+            var logAmmoGenerator = new Generation.AirlockAmmoGenerator(options.Host, options.Port, options.ApiKey,
                 new SingleGroupMessageGenerator(new UniformEventGroupGenerator("load.load.load.logs",
                     new LogAirlockEventGenerator())));
 

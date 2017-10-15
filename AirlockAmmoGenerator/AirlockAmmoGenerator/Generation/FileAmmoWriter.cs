@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public class FileAmmoWriter : IAmmoWriter
     {

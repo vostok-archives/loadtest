@@ -1,4 +1,4 @@
-﻿namespace AirlockAmmoGenerator
+﻿namespace AirlockAmmoGenerator.Generation
 {
     public enum AmmoType
     {

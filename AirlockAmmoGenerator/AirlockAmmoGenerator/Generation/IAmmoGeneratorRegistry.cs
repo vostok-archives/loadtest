@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace AirlockAmmoGenerator
+﻿namespace AirlockAmmoGenerator.Generation
 {
     public interface IAmmoGeneratorRegistry
     {

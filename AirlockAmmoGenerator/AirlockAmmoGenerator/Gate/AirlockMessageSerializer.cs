@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Vostok.Commons.Binary;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Gate
 {
     public class AirlockMessageSerializer
     {

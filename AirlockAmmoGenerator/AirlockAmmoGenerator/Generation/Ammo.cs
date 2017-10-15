@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public class Ammo
     {

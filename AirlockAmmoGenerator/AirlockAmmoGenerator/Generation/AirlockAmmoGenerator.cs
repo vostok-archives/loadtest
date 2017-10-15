@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AirlockAmmoGenerator.Gate;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public class AirlockAmmoGenerator : IAmmoGenerator
     {

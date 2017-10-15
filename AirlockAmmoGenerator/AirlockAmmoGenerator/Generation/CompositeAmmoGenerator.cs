@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public class CompositeAmmoGenerator : IAmmoGenerator
     {
@@ -28,7 +28,7 @@ namespace AirlockAmmoGenerator
             }
 
             if (remainingCount > 0)
-                result.AddRange(_generatorRegistry.First().Value.Generate(remainingCount));
+                result.AddRange(Enumerable.First(_generatorRegistry).Value.Generate(remainingCount));
 
             Shuffle(result);
             return result;

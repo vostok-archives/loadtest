@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using AirlockAmmoGenerator.Gate;
+using AirlockAmmoGenerator.Generation;
 using Vostok.Logging.Airlock;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Special
 {
     public class LogAirlockEventGenerator : IAirlockEventGenerator
     {

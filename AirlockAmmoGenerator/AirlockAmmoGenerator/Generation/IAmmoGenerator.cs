@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public interface IAmmoGenerator
     {

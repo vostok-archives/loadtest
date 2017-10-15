@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using AirlockAmmoGenerator.Gate;
 
-namespace AirlockAmmoGenerator
+namespace AirlockAmmoGenerator.Generation
 {
     public interface IMessageGenerator
     {
