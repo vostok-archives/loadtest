@@ -17,12 +17,14 @@ namespace AirlockAmmoGenerator
                 Output = "output.txt"
             };
             // todo: parse options
+
+            var logAmmoGenerator = new AirlockAmmoGenerator(options.Host, options.Port, options.ApiKey,
+                new SingleGroupMessageGenerator(new UniformEventGroupGenerator("load.load.load.logs",
+                    new LogAirlockEventGenerator())));
+
             var registry = new Dictionary<AmmoType, IAmmoGenerator>
             {
-                {
-                    AmmoType.Logs,
-                    new AirlockAmmoGenerator(options.Host, options.Port, options.ApiKey, new LogAirlockEventGenerator())
-                }
+                {AmmoType.Logs, logAmmoGenerator}
             };
             // todo: fill registry
             var generator = new CompositeAmmoGenerator(registry, options.AmmoTypes);
