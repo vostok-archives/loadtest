@@ -13,7 +13,7 @@ namespace AirlockAmmoGenerator
                 Count = 3,
                 Host = "localhost",
                 Port = 8888,
-                ApiKey = "*",
+                ApiKey = "UniversalApiKey",
                 Output = "output.txt"
             };
             // todo: parse options

@@ -10,25 +10,33 @@ namespace AirlockAmmoGenerator
         private readonly string _apiKey;
         private readonly IAirlockEventGenerator _eventGenerator;
         private readonly Uri _sendUri;
+        private readonly AirlockMessageSerializer _messageSerializer;
 
         public AirlockAmmoGenerator(string host, int port, string apiKey, IAirlockEventGenerator eventGenerator)
         {
             _apiKey = apiKey;
             _eventGenerator = eventGenerator;
             _sendUri = BuildSendUri(host, port);
+            _messageSerializer = new AirlockMessageSerializer();
         }
 
         public IEnumerable<Ammo> Generate(int count)
         {
-            foreach (var e in _eventGenerator.Generate().Take(count))
+            for (int i = 0; i < count; i++)
             {
+                var events = _eventGenerator.Generate().Take(100);
+                var records = events.Select(x => new EventRecord {Timestamp = DateTimeOffset.Now, Body = x}).ToList();
+                var group = new EventGroup {EventRecords = records, RoutingKey = "load.tank.load.logs"};
+                var message = new AirlockMessage {EventGroups = new List<EventGroup> {group}};
+                var messageBytes = _messageSerializer.Serialize(message);
+
                 yield return new Ammo
                 {
                     Target = _sendUri,
-                    Body = e,
+                    Body = messageBytes,
                     Headers = new Dictionary<string, string>
                     {
-                        {"Content-Length", e.Length.ToString(NumberFormatInfo.InvariantInfo)},
+                        {"Content-Length", messageBytes.Length.ToString(NumberFormatInfo.InvariantInfo)},
                         {"x-apikey", _apiKey}
                     }
                 };

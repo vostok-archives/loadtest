@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +42,6 @@ namespace AirlockAmmoGenerator
                         writer.Write($"{header.Key}: {header.Value}\r\n");
                     writer.Write("\r\n");
                 }
-                Console.WriteLine(ammo.Body[0]);
                 stream.Write(ammo.Body, 0, ammo.Body.Length);
                 return stream.ToArray();
             }
