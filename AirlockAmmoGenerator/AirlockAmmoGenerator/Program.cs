@@ -15,8 +15,7 @@ namespace AirlockAmmoGenerator
             // todo: fill registry
             var generator = new CompositeAmmoGenerator(registry, options.AmmoTypes);
             var ammo = generator.Generate().Take(options.Count);
-            var writer = default(IAmmoWriter);
-            // todo: implement writer
+            var writer = new FileAmmoWriter(options.Output);
             await writer.WriteAsync(ammo);
 
             var s = new LogEventDataSerializer();

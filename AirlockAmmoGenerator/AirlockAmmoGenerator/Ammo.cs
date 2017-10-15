@@ -8,10 +8,8 @@ namespace AirlockAmmoGenerator
     {
         public byte[] Body { get; set; }
 
-        public Uri Path { get; set; }
+        public Uri Target { get; set; }
 
-        public string ApiKey { get; set; }
-
-        public HttpRequestHeaders Headers { get; set; } 
+        public Dictionary<string, string> Headers { get; set; } 
     }
 }
