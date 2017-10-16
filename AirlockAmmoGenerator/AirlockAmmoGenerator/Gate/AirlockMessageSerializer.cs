@@ -25,7 +25,7 @@ namespace AirlockAmmoGenerator.Gate
 
         private void SerializeEventRecord(IBinaryWriter writer, EventRecord record)
         {
-            writer.Write(record.Timestamp.UtcTicks);
+            writer.Write(record.Timestamp.ToUnixTimeMilliseconds());
             writer.Write(record.Body);
         }
     }

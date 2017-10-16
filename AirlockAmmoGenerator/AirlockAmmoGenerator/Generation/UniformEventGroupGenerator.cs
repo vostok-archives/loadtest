@@ -20,7 +20,7 @@ namespace AirlockAmmoGenerator.Generation
         {
             for (int i = 0; i < count; i++)
             {
-                var records = Enumerable.Take<EventRecord>(_eventGenerator.Generate().Select(EventRecordHelper.WithBody), GroupSize).ToList();
+                var records = _eventGenerator.Generate().Select(EventRecordHelper.WithBody).Take(GroupSize).ToList();
                 yield return new EventGroup
                 {
                     RoutingKey = _routingKey,

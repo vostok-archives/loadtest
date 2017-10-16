@@ -16,7 +16,7 @@ namespace AirlockAmmoGenerator
                 Host = "localhost",
                 Port = 8888,
                 ApiKey = "UniversalApiKey",
-                Output = "output.txt"
+                Output = "ammo-logs.txt"
             };
             // todo: parse options
 
