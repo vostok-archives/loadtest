@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Vostok.Logging;
 
 namespace EventGenerator
 {
@@ -19,7 +20,8 @@ namespace EventGenerator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IEventGenerationManager>(new EventGenerationManager());
+            var log = services.BuildServiceProvider().GetService<ILog>();
+            services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(log));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

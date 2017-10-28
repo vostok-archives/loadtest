@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Vostok.Instrumentation.AspNetCore;
 
 namespace EventGenerator
 {
@@ -12,6 +14,11 @@ namespace EventGenerator
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", false, true);
+                })
+                .UseVostok()
                 .UseStartup<Startup>()
                 .Build();
     }
