@@ -3,6 +3,7 @@
     public enum EventType
     {
         Logs,
-        Trace
+        Trace,
+        Metric
     }
 }

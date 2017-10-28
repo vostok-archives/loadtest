@@ -8,6 +8,7 @@ using Serilog;
 using Vostok.Airlock;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
+using Vostok.Metrics;
 
 namespace EventGenerator
 {
@@ -37,10 +38,12 @@ namespace EventGenerator
                 .WriteTo.Airlock(airlockClient, routingKeyPrefix)
                 .CreateLogger();
             var log = new SerilogLog(airlockLogger).WithFlowContext();
+            var rootMetricScope = serviceProvider.GetService<IMetricScope>();
 
             var registry = new EventGeneratorRegistry();
             registry.Add(EventType.Logs, new LogEventGenerator(log));
             registry.Add(EventType.Trace, new TraceEventGenerator());
+            registry.Add(EventType.Metric, new MetricEventGenerator(rootMetricScope));
             services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(registry));
         }
 

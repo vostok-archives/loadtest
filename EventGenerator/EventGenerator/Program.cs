@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Vostok.Airlock;
 using Vostok.Instrumentation.AspNetCore;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
@@ -24,8 +23,10 @@ namespace EventGenerator
                 {
                     config.AddJsonFile("appsettings.json", false, true);
                 })
-                .ConfigureAirlock()
                 .ConfigureLogging(ConfigureLogging)
+                .ConfigureAirlock()
+                .ConfigureVostokMetrics()
+                .ConfigureVostokTracing()
                 .UseStartup<Startup>()
                 .Build();
 
