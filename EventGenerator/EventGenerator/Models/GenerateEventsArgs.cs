@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventGenerator.Models
 {
@@ -8,6 +9,6 @@ namespace EventGenerator.Models
         public EventType EventType { get; set; }
 
         [Range(1, 10000)]
-        public int Count { get; set; }
+        public int Count { get; set; } = 1;
     }
 }
