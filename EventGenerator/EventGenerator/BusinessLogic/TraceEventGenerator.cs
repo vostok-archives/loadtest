@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using Vostok.Tracing;
+﻿using Vostok.Tracing;
 
 namespace EventGenerator.BusinessLogic
 {
     public class TraceEventGenerator : IEventGenerator
     {
-        public Task Generate(int count)
+        public void Generate(int count)
         {
             using (var spanBuilder = Trace.BeginSpan())
             {
@@ -18,7 +17,6 @@ namespace EventGenerator.BusinessLogic
                 spanBuilder.SetAnnotation(TracingAnnotationNames.HttpResponseContentLength, 2048);
                 spanBuilder.SetAnnotation(TracingAnnotationNames.HttpCode, 200);
             }
-            return Task.FromResult(0);
         }
     }
 }

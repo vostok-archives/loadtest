@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using EventGenerator.BusinessLogic;
+﻿using EventGenerator.BusinessLogic;
 using EventGenerator.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +15,11 @@ namespace EventGenerator.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index([FromBody] GenerateEventsArgs args)
+        public IActionResult Index([FromBody] GenerateEventsArgs args)
         {
             if (ModelState.IsValid)
             {
-                var ok = await _manager.SendAsync(args.EventType, args.Count);
+                var ok = _manager.Send(args.EventType, args.Count);
                 return ok ? Ok() : StatusCode(500);
             }
             return BadRequest(ModelState);

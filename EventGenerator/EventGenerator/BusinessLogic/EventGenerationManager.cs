@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using EventGenerator.Models;
+﻿using EventGenerator.Models;
 
 namespace EventGenerator.BusinessLogic
 {
@@ -12,12 +11,12 @@ namespace EventGenerator.BusinessLogic
             _generatorRegistry = generatorRegistry;
         }
 
-        public async Task<bool> SendAsync(EventType argsEventType, int argsCount)
+        public bool Send(EventType argsEventType, int argsCount)
         {
             var generator = _generatorRegistry.Get(argsEventType);
             if (generator != null)
             {
-                await generator.Generate(argsCount);
+                generator.Generate(argsCount);
                 return true;
             }
             return false;

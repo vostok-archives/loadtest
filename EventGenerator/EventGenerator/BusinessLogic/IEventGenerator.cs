@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace EventGenerator.BusinessLogic
+﻿namespace EventGenerator.BusinessLogic
 {
     public interface IEventGenerator
     {
-        Task Generate(int count);
+        void Generate(int count);
     }
 }

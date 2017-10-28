@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Vostok.Metrics;
 using Vostok.Metrics.Meters;
 
@@ -14,11 +13,10 @@ namespace EventGenerator.BusinessLogic
             _counter = scope.Counter(TimeSpan.FromMilliseconds(100), "generated");
         }
 
-        public Task Generate(int count)
+        public void Generate(int count)
         {
             for (var i = 0; i < count; i++)
                 _counter.Add();
-            return Task.FromResult(0);
         }
     }
 }

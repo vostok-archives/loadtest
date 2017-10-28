@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Vostok.Logging;
+﻿using Vostok.Logging;
 
 namespace EventGenerator.BusinessLogic
 {
@@ -12,10 +11,9 @@ namespace EventGenerator.BusinessLogic
             _log = log;
         }
 
-        public Task Generate(int count)
+        public void Generate(int count)
         {
             _log.Info("Hello, World!");
-            return Task.FromResult(true);
         }
     }
 }
