@@ -1,9 +1,0 @@
-phantom:
-  address: localhost:8888
-  load_profile:
-    load_type: rps
-    schedule: line(1, 10, 10m)
-  ammo_type: phantom
-  ammofile: ammo
-telegraf:
-  enabled: false
