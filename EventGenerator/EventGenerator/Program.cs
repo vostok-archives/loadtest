@@ -23,6 +23,7 @@ namespace EventGenerator
                 {
                     config.AddJsonFile("appsettings.json", false, true);
                 })
+                .UseUrls("http://*:5000")
                 .ConfigureLogging(ConfigureLogging)
                 .ConfigureAirlock()
                 .ConfigureVostokMetrics()

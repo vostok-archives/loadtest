@@ -1,0 +1,9 @@
+phantom:
+  address: localhost:5000
+  load_profile:
+    load_type: rps
+    schedule: line(1, 10, 10m)
+  ammo_type: uripost
+  ammofile: ammo
+telegraf:
+  enabled: false
