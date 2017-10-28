@@ -6,16 +6,19 @@ namespace EventGenerator.BusinessLogic
     {
         public void Generate(int count)
         {
-            using (var spanBuilder = Trace.BeginSpan())
+            for (int i = 0; i < count; i++)
             {
-                spanBuilder.SetAnnotation(TracingAnnotationNames.Operation, "Generate Trace");
-                spanBuilder.SetAnnotation(TracingAnnotationNames.Kind, "loadtest");
-                spanBuilder.SetAnnotation(TracingAnnotationNames.Service, "event-generator");
-                spanBuilder.SetAnnotation(TracingAnnotationNames.Host, "localhost");
-                spanBuilder.SetAnnotation(TracingAnnotationNames.HttpUrl, "send");
-                spanBuilder.SetAnnotation(TracingAnnotationNames.HttpRequestContentLength, 1024);
-                spanBuilder.SetAnnotation(TracingAnnotationNames.HttpResponseContentLength, 2048);
-                spanBuilder.SetAnnotation(TracingAnnotationNames.HttpCode, 200);
+                using (var spanBuilder = Trace.BeginSpan())
+                {
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.Operation, "Generate Trace");
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.Kind, "loadtest");
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.Service, "event-generator");
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.Host, "localhost");
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.HttpUrl, "send");
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.HttpRequestContentLength, 1024);
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.HttpResponseContentLength, 2048);
+                    spanBuilder.SetAnnotation(TracingAnnotationNames.HttpCode, 200);
+                }
             }
         }
     }

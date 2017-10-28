@@ -13,7 +13,8 @@ namespace EventGenerator.BusinessLogic
 
         public void Generate(int count)
         {
-            _log.Info("Hello, World!");
+            for (int i = 0; i < count; i++)
+                _log.Info("Generate info log event");
         }
     }
 }
