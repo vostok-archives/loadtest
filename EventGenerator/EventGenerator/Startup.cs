@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Vostok.Airlock;
 using Vostok.Logging;
+using Vostok.Logging.Serilog;
 
 namespace EventGenerator
 {
@@ -22,7 +25,19 @@ namespace EventGenerator
         {
             services.AddMvc();
 
-            var log = services.BuildServiceProvider().GetService<ILog>();
+            var serviceProvider = services.BuildServiceProvider();
+            var airlockClient = serviceProvider.GetService<IAirlockClient>();
+            var service = Configuration.GetValue<string>("service");
+            var project = Configuration.GetValue<string>("project");
+            var environment = Configuration.GetValue<string>("environment");
+            var routingKeyPrefix = RoutingKey.Create(project, environment, service, RoutingKey.LogsSuffix);
+
+            var airlockLogger = new LoggerConfiguration()
+                .Enrich.WithProperty("Service", service)
+                .WriteTo.Airlock(airlockClient, routingKeyPrefix)
+                .CreateLogger();
+            var log = new SerilogLog(airlockLogger).WithFlowContext();
+
             var registry = new EventGeneratorRegistry();
             registry.Add(EventType.Logs, new LogEventGenerator(log));
             services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(registry));
