@@ -40,6 +40,7 @@ namespace EventGenerator
 
             var registry = new EventGeneratorRegistry();
             registry.Add(EventType.Logs, new LogEventGenerator(log));
+            registry.Add(EventType.Trace, new TraceEventGenerator());
             services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(registry));
         }
 
