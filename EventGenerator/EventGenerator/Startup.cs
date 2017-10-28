@@ -1,4 +1,5 @@
 ﻿using EventGenerator.BusinessLogic;
+using EventGenerator.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,8 +21,11 @@ namespace EventGenerator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
             var log = services.BuildServiceProvider().GetService<ILog>();
-            services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(log));
+            var registry = new EventGeneratorRegistry();
+            registry.Add(EventType.Logs, new LogEventGenerator(log));
+            services.AddSingleton<IEventGenerationManager>(new EventGenerationManager(registry));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

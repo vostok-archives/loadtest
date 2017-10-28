@@ -1,22 +1,26 @@
 ﻿using System.Threading.Tasks;
 using EventGenerator.Models;
-using Vostok.Logging;
 
 namespace EventGenerator.BusinessLogic
 {
     public class EventGenerationManager : IEventGenerationManager
     {
-        private readonly ILog _log;
+        private readonly IEventGeneratorRegistry _generatorRegistry;
 
-        public EventGenerationManager(ILog log)
+        public EventGenerationManager(IEventGeneratorRegistry generatorRegistry)
         {
-            _log = log;
+            _generatorRegistry = generatorRegistry;
         }
 
-        public Task<bool> SendAsync(EventType argsEventType, int argsCount)
+        public async Task<bool> SendAsync(EventType argsEventType, int argsCount)
         {
-            _log.Info("Hello, World!");
-            return Task.FromResult(true);
+            var generator = _generatorRegistry.Get(argsEventType);
+            if (generator != null)
+            {
+                await generator.Generate(argsCount);
+                return true;
+            }
+            return false;
         }
     }
 }
